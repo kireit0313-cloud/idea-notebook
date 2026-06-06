@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>アイデア帳</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#C4652A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="アイデア帳">
+<link rel="apple-touch-icon" href="icon-192.png">
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600&family=Noto+Sans+JP:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #FDFAF6; --surface: #FFFFFF; --surface-hover: #FAF7F2;
+  --border: #E8E0D4; --border-light: #F0EBE3;
+  --ink: #2C2416; --ink-mid: #6B5D4E; --ink-soft: #9E8E7E; --ink-faint: #C4B8AC;
+  --accent: #C4652A; --accent-light: #FFF1E8;
+  --teal: #2A7B6F; --teal-light: #EDF6F4; --teal-border: #B2D9D3;
+  --indigo: #3D4FA0; --indigo-light: #ECEFFE; --indigo-border: #BEC5E8;
+  --gold-light: #FEF9EC; --danger: #B83232; --mic: #D94040;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --max-w: 640px;
+}
+
+html { height: 100%; }
+body {
+  background: var(--bg);
+  font-family: 'Noto Serif JP','Hiragino Mincho ProN',Georgia,serif;
+  min-height: 100%; min-height: 100dvh;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* ── API Screen ── */
+#apiscreen {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 100dvh; padding: max(2rem, var(--safe-top)) 1.25rem max(2rem, var(--safe-bottom));
+}
+.api-box {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 20px; padding: 2rem 1.75rem;
+  max-width: 440px; width: 100%;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.07);
+}
+.api-logo {
+  width: 56px; height: 56px; background: var(--accent);
+  border-radius: 14px; display: flex; align-items: center; justify-content: center;
+  font-size: 26px; margin-bottom: 1.25rem;
+}
+.api-box h2 { font-size: 20px; color: var(--ink); margin-bottom: 6px; }
+.api-box p { font-size: 13px; color: var(--ink-soft); font-family: 'Noto Sans JP',sans-serif; line-height: 1.8; margin-bottom: 1.5rem; }
+.api-input {
+  width: 100%; padding: 12px 14px; border: 1px solid var(--border);
+  border-radius: 10px; font-size: 14px; font-family: monospace;
+  color: var(--ink); background: var(--bg); outline: none; margin-bottom: 10px;
+  -webkit-appearance: none;
+}
+.api-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(196,101,42,0.12); }
+.api-btn {
+  width: 100%; padding: 13px; background: var(--accent); color: #fff;
+  border: none; border-radius: 10px; font-size: 15px; font-weight: 500;
+  font-family: 'Noto Sans JP',sans-serif; cursor: pointer;
+  -webkit-tap-highlight-color: transparent; transition: opacity 0.15s;
+}
+.api-btn:active { opacity: 0.8; }
+.api-note { font-size: 11px; color: var(--ink-faint); font-family: 'Noto Sans JP',sans-serif; margin-top: 12px; text-align: center; }
+.api-error { font-size: 12px; color: var(--danger); font-family: 'Noto Sans JP',sans-serif; margin-top: 8px; display: none; }
+
+/* ── App Shell ── */
+#app { display: none; min-height: 100dvh; display: none; flex-direction: column; }
+
+/* Top bar */
+.topbar {
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  padding: calc(var(--safe-top) + 12px) 1.25rem 12px;
+  position: sticky; top: 0; z-index: 100;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+}
+.topbar-inner { max-width: var(--max-w); margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.topbar-left { display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+.app-title { font-size: 18px; font-weight: 600; color: var(--ink); white-space: nowrap; }
+.ai-badge {
+  font-size: 10px; color: var(--ink-faint); background: var(--gold-light);
+  border: 1px solid var(--border); border-radius: 99px; padding: 2px 8px;
+  font-family: 'Noto Sans JP',sans-serif; white-space: nowrap;
+}
+.idea-count { font-size: 12px; color: var(--ink-soft); font-family: 'Noto Sans JP',sans-serif; white-space: nowrap; }
+
+/* Menu button (mobile) */
+.menu-btn {
+  display: none; background: none; border: 1px solid var(--border);
+  border-radius: 8px; padding: 6px 10px; cursor: pointer; color: var(--ink-soft);
+  font-size: 16px; -webkit-tap-highlight-color: transparent;
+}
+@media (max-width: 540px) {
+  .menu-btn { display: block; }
+  .toolbar-btns { display: none; flex-direction: column; gap: 8px; position: absolute; top: calc(var(--safe-top) + 56px); right: 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); z-index: 200; min-width: 160px; }
+  .toolbar-btns.open { display: flex; }
+  .toolbar-btns .settings-btn, .toolbar-btns label.settings-btn { width: 100%; justify-content: flex-start; text-align: left; }
+}
+.toolbar-btns { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+
+/* Content */
+.content { max-width: var(--max-w); margin: 0 auto; padding: 1rem 1rem calc(1rem + var(--safe-bottom)); flex: 1; }
+
+/* Input box */
+.input-box {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 14px 14px 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 10px;
+}
+.input-top { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; min-height: 32px; }
+.main-input {
+  flex: 1; border: none; outline: none; font-size: 16px; /* 16px prevents iOS zoom */
+  color: var(--ink); background: transparent;
+  font-family: 'Noto Serif JP',Georgia,serif; line-height: 1.5;
+  -webkit-appearance: none;
+}
+.main-input::placeholder { color: var(--ink-faint); }
+.input-bottom {
+  display: flex; gap: 8px; justify-content: flex-end;
+  border-top: 1px solid var(--border-light); padding-top: 10px;
+  flex-wrap: wrap;
+}
+.mic-btn {
+  display: flex; align-items: center; gap: 6px; padding: 9px 14px;
+  border: 1px solid var(--border); border-radius: 9px; background: transparent;
+  color: var(--ink-mid); cursor: pointer; font-size: 13px;
+  font-family: 'Noto Sans JP',sans-serif; transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent; min-height: 40px;
+}
+.mic-btn.active { border-color: var(--mic); background: #D9404018; color: var(--mic); }
+.add-btn {
+  padding: 9px 20px; border: 1px solid var(--border); border-radius: 9px;
+  background: transparent; color: var(--ink); cursor: pointer; font-size: 13px;
+  font-family: 'Noto Sans JP',sans-serif; font-weight: 500; transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent; min-height: 40px;
+}
+.add-btn:active:not(:disabled) { background: var(--accent); color: #fff; border-color: var(--accent); }
+@media (hover: hover) {
+  .add-btn:hover:not(:disabled) { background: var(--accent); color: #fff; border-color: var(--accent); }
+}
+.add-btn:disabled { opacity: 0.4; cursor: default; }
+.settings-btn {
+  padding: 7px 12px; border: 1px solid var(--border); border-radius: 8px;
+  background: transparent; color: var(--ink-soft); cursor: pointer; font-size: 12px;
+  font-family: 'Noto Sans JP',sans-serif; transition: all 0.15s; white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Feedback */
+.generating-bar {
+  background: var(--accent-light); border: 1px dashed rgba(196,101,42,0.3);
+  border-radius: 10px; padding: 12px 16px; display: flex; align-items: center;
+  gap: 10px; margin-bottom: 10px; font-size: 13px; color: var(--accent);
+  font-family: 'Noto Sans JP',sans-serif;
+}
+.error-msg { font-size: 12px; color: var(--danger); font-family: 'Noto Sans JP',sans-serif; margin-bottom: 8px; display: none; }
+.empty { text-align: center; padding: 5rem 1rem; color: var(--ink-faint); }
+.empty-icon { font-size: 36px; margin-bottom: 14px; opacity: 0.45; }
+.empty-text { font-size: 14px; font-family: 'Noto Sans JP',sans-serif; }
+
+/* Cards */
+.idea-list { display: flex; flex-direction: column; gap: 8px; }
+.idea-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 13px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  transition: box-shadow 0.2s;
+}
+.card-header {
+  display: flex; align-items: center; gap: 10px; padding: 13px 14px;
+  cursor: pointer; border-left: 3px solid var(--accent); transition: background 0.15s;
+  -webkit-tap-highlight-color: transparent; user-select: none;
+}
+@media (hover: hover) { .card-header:hover { background: var(--surface-hover); } }
+.card-header:active { background: var(--surface-hover); }
+.card-num { font-size: 10px; color: var(--ink-faint); min-width: 20px; font-family: monospace; flex-shrink: 0; }
+.card-title { flex: 1; font-size: 15px; font-weight: 600; color: var(--ink); letter-spacing: -0.2px; min-width: 0; word-break: break-all; }
+.card-date { font-size: 11px; color: var(--ink-faint); font-family: 'Noto Sans JP',sans-serif; white-space: nowrap; flex-shrink: 0; }
+.del-btn {
+  background: none; border: none; color: var(--ink-faint); cursor: pointer;
+  font-size: 13px; padding: 4px 6px; transition: color 0.15s; flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent; min-width: 28px; min-height: 28px;
+  display: flex; align-items: center; justify-content: center;
+}
+@media (hover: hover) { .del-btn:hover { color: var(--danger); } }
+.chevron { color: var(--ink-soft); font-size: 16px; transition: transform 0.2s; display: inline-block; flex-shrink: 0; }
+.chevron.open { transform: rotate(90deg); }
+
+.card-summary {
+  border-top: 1px solid var(--teal-border); padding: 13px 16px 13px 17px;
+  background: var(--teal-light); border-left: 3px solid var(--teal);
+}
+.summary-text { font-size: 14px; color: #1D4D47; line-height: 1.8; margin-bottom: 10px; }
+.detail-toggle {
+  background: none; border: none; font-size: 12px; color: var(--teal); cursor: pointer;
+  padding: 0; font-family: 'Noto Sans JP',sans-serif; font-weight: 600;
+  -webkit-tap-highlight-color: transparent; min-height: 32px;
+}
+
+.card-detail {
+  border-top: 1px solid var(--indigo-border); padding: 13px 16px 15px 17px;
+  background: var(--indigo-light); border-left: 3px solid var(--indigo);
+}
+.detail-text { font-size: 13px; color: #252D5C; line-height: 1.85; margin-bottom: 12px; }
+.points-list { list-style: none; padding: 0; margin: 0 0 12px; display: flex; flex-direction: column; gap: 7px; }
+.point-item { display: flex; gap: 8px; font-size: 13px; color: #3A4280; line-height: 1.65; font-family: 'Noto Sans JP',sans-serif; }
+.point-arrow { color: var(--indigo); font-weight: 700; flex-shrink: 0; }
+.raw-note { font-size: 11px; color: var(--ink-faint); border-top: 1px solid var(--indigo-border); padding-top: 9px; font-family: 'Noto Sans JP',sans-serif; }
+
+/* Animations */
+.wave-wrap { display: flex; align-items: center; gap: 3px; height: 20px; }
+.wave-bar { width: 3px; background: var(--mic); border-radius: 2px; animation: wave 0.8s ease-in-out infinite; }
+@keyframes wave { 0%,100%{height:4px} 50%{height:16px} }
+.dots-wrap { display: flex; gap: 5px; align-items: center; }
+.dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); animation: blink 1.2s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:0.2} 50%{opacity:1} }
+
+/* Install banner */
+#installBanner {
+  display: none; align-items: center; justify-content: space-between; gap: 10px;
+  background: var(--accent); color: #fff; padding: 10px 14px;
+  font-family: 'Noto Sans JP',sans-serif; font-size: 13px;
+}
+#installBanner button {
+  background: rgba(255,255,255,0.25); border: none; color: #fff;
+  padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px;
+  font-family: 'Noto Sans JP',sans-serif; white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Responsive tweaks */
+@media (max-width: 400px) {
+  .card-date { display: none; }
+  .app-title { font-size: 16px; }
+  .ai-badge { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- API Key Screen -->
+<div id="apiscreen">
+  <div class="api-box">
+    <div class="api-logo">🗒</div>
+    <h2>アイデア帳</h2>
+    <p>ご利用にはAnthropicのAPIキーが必要です。<br>キーはこの端末のブラウザ内にのみ保存されます。</p>
+    <input class="api-input" id="apiKeyInput" type="password" placeholder="sk-ant-..." autocomplete="off" inputmode="text"/>
+    <div id="apiError" class="api-error"></div>
+    <button class="api-btn" onclick="saveApiKey()">はじめる</button>
+    <p class="api-note">APIキーは <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com</a> で取得できます</p>
+  </div>
+</div>
+
+<!-- Main App -->
+<div id="app" style="display:none">
+
+  <!-- Install Banner -->
+  <div id="installBanner">
+    <span>📱 ホーム画面に追加してアプリとして使えます</span>
+    <div style="display:flex;gap:8px">
+      <button onclick="installApp()">追加する</button>
+      <button onclick="dismissBanner()">✕</button>
+    </div>
+  </div>
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div>
+        <div class="topbar-left">
+          <span class="app-title">アイデア帳</span>
+          <span class="ai-badge">AI 自動生成</span>
+        </div>
+        <div class="idea-count" id="ideaCount">0 件のアイデア</div>
+      </div>
+      <!-- Desktop toolbar -->
+      <div class="toolbar-btns" id="toolbarBtns">
+        <button class="settings-btn" onclick="changeApiKey();closeMenu()">⚙ キー変更</button>
+        <button class="settings-btn" onclick="exportIdeas();closeMenu()">📤 エクスポート</button>
+        <label class="settings-btn" style="cursor:pointer;display:flex;align-items:center">
+          📥 インポート<input type="file" accept=".json" onchange="importIdeas(event)" style="display:none"/>
+        </label>
+      </div>
+      <!-- Mobile hamburger -->
+      <button class="menu-btn" onclick="toggleMenu()" aria-label="メニュー">☰</button>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+    <div class="input-box">
+      <div class="input-top" id="inputTop">
+        <input class="main-input" id="mainInput" placeholder="アイデアのタネをメモ…" autocomplete="off" enterkeyhint="send"/>
+      </div>
+      <div class="input-bottom">
+        <button class="mic-btn" id="micBtn" onclick="toggleMic()" style="display:none">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="9" y1="22" x2="15" y2="22"/></svg>
+          <span id="micLabel">音声</span>
+        </button>
+        <button class="add-btn" id="addBtn" onclick="handleAdd()" disabled>追加 →</button>
+      </div>
+    </div>
+    <div id="errorMsg" class="error-msg"></div>
+    <div id="generatingBar" class="generating-bar" style="display:none">
+      <div class="dots-wrap">
+        <div class="dot" style="animation-delay:0s"></div>
+        <div class="dot" style="animation-delay:0.3s"></div>
+        <div class="dot" style="animation-delay:0.6s"></div>
+      </div>
+      AIがアイデアを展開中…
+    </div>
+    <div id="emptyState" class="empty">
+      <div class="empty-icon">✦</div>
+      <div class="empty-text">最初のアイデアを入力してみましょう</div>
+    </div>
+    <div class="idea-list" id="ideaList"></div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'idea-notebook-pwa-v1';
+const API_KEY_STORE = 'idea-notebook-apikey';
+let ideas = [], openId = null, openDetail = null, generating = false;
+let listening = false, recognition = null, apiKey = '';
+let deferredInstall = null;
+
+// ── PWA Install ──────────────────────────────────────
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstall = e;
+  if (!localStorage.getItem('installDismissed')) {
+    document.getElementById('installBanner').style.display = 'flex';
+  }
+});
+function installApp() {
+  if (!deferredInstall) return;
+  deferredInstall.prompt();
+  deferredInstall.userChoice.then(() => { dismissBanner(); deferredInstall = null; });
+}
+function dismissBanner() {
+  document.getElementById('installBanner').style.display = 'none';
+  localStorage.setItem('installDismissed', '1');
+}
+
+// ── Service Worker ───────────────────────────────────
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+
+// ── Init ─────────────────────────────────────────────
+function init() {
+  apiKey = localStorage.getItem(API_KEY_STORE) || '';
+  if (apiKey) showApp();
+  if (window.SpeechRecognition || window.webkitSpeechRecognition) {
+    document.getElementById('micBtn').style.display = 'flex';
+  }
+  try { const s = localStorage.getItem(STORAGE_KEY); if (s) ideas = JSON.parse(s); } catch(_) {}
+  renderAll();
+  const inp = document.getElementById('mainInput');
+  inp.addEventListener('input', () => {
+    document.getElementById('addBtn').disabled = !inp.value.trim() || generating;
+  });
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') handleAdd(); });
+  // Close menu on outside click
+  document.addEventListener('click', e => {
+    const tb = document.getElementById('toolbarBtns');
+    if (tb && tb.classList.contains('open') && !tb.contains(e.target) && !e.target.closest('.menu-btn')) {
+      tb.classList.remove('open');
+    }
+  });
+}
+
+function toggleMenu() {
+  document.getElementById('toolbarBtns').classList.toggle('open');
+}
+function closeMenu() {
+  document.getElementById('toolbarBtns').classList.remove('open');
+}
+
+// ── API Key ──────────────────────────────────────────
+function saveApiKey() {
+  const val = document.getElementById('apiKeyInput').value.trim();
+  const errEl = document.getElementById('apiError');
+  if (!val) { errEl.textContent = 'APIキーを入力してください'; errEl.style.display = 'block'; return; }
+  if (!val.startsWith('sk-ant-')) { errEl.textContent = 'APIキーは sk-ant- から始まる文字列です'; errEl.style.display = 'block'; return; }
+  apiKey = val;
+  localStorage.setItem(API_KEY_STORE, apiKey);
+  errEl.style.display = 'none';
+  showApp();
+}
+function changeApiKey() {
+  document.getElementById('apiKeyInput').value = '';
+  document.getElementById('apiError').style.display = 'none';
+  document.getElementById('apiscreen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+}
+function showApp() {
+  document.getElementById('apiscreen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  setTimeout(() => document.getElementById('mainInput').focus(), 100);
+}
+
+// ── AI Generation ────────────────────────────────────
+async function generateIdeaContent(raw) {
+  const prompt = `以下のメモからアイデア帳のエントリを日本語で生成してください。\nメモ: 「${raw}」\n\n以下のJSONのみを返してください（前置き・コードブロック不要）:\n{\n  "title": "アイデアのタイトル（20文字以内、体言止め）",\n  "summary": "60〜80文字のサマリー（このアイデアが何で、なぜ面白いか）",\n  "detail": "150〜200文字の詳細説明（可能性・課題・アプローチ）",\n  "points": ["具体的なアクション・特徴1", "具体的なアクション・特徴2", "具体的なアクション・特徴3"]\n}`;
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({ model: 'claude-sonnet-4-5', max_tokens: 1000, messages: [{ role: 'user', content: prompt }] })
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message);
+  const text = data.content.map(b => b.text || '').join('');
+  return JSON.parse(text.replace(/```json|```/g, '').trim());
+}
+
+async function handleAdd() {
+  const inp = document.getElementById('mainInput');
+  const raw = inp.value.trim();
+  if (!raw || generating) return;
+  inp.value = ''; inp.dispatchEvent(new Event('input'));
+  // Blur on mobile to hide keyboard
+  inp.blur();
+  generating = true;
+  setError(null);
+  document.getElementById('generatingBar').style.display = 'flex';
+  document.getElementById('addBtn').disabled = true;
+  try {
+    const content = await generateIdeaContent(raw);
+    const idea = { id: Date.now(), raw, ...content, createdAt: new Date().toLocaleDateString('ja-JP') };
+    ideas.unshift(idea);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(ideas));
+    openId = idea.id; openDetail = null;
+    renderAll();
+  } catch(e) {
+    console.error(e);
+    setError('エラー: ' + (e.message || '生成に失敗しました'));
+  } finally {
+    generating = false;
+    document.getElementById('generatingBar').style.display = 'none';
+  }
+}
+
+// ── Card Actions ─────────────────────────────────────
+function deleteIdea(id) {
+  if (!confirm('このアイデアを削除しますか？')) return;
+  ideas = ideas.filter(i => i.id !== id);
+  if (openId === id) { openId = null; openDetail = null; }
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(ideas));
+  renderAll();
+}
+function toggleCard(id) { openId = openId === id ? null : id; openDetail = null; renderAll(); }
+function toggleDetail(id) { openDetail = openDetail === id ? null : id; renderAll(); }
+function setError(msg) {
+  const el = document.getElementById('errorMsg');
+  if (msg) { el.textContent = msg; el.style.display = 'block'; } else { el.style.display = 'none'; }
+}
+
+// ── Mic ──────────────────────────────────────────────
+function toggleMic() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return;
+  if (listening) { recognition && recognition.stop(); setListeningUI(false); return; }
+  recognition = new SR();
+  recognition.lang = 'ja-JP'; recognition.continuous = false; recognition.interimResults = true;
+  recognition.onresult = e => {
+    const t = Array.from(e.results).map(r => r[0].transcript).join('');
+    document.getElementById('mainInput').value = t;
+    document.getElementById('mainInput').dispatchEvent(new Event('input'));
+  };
+  recognition.onend = () => setListeningUI(false);
+  recognition.onerror = () => { setListeningUI(false); setError('マイクへのアクセスに失敗しました。'); };
+  recognition.start();
+  setListeningUI(true);
+}
+function setListeningUI(val) {
+  listening = val;
+  const btn = document.getElementById('micBtn');
+  const top = document.getElementById('inputTop');
+  const inp = document.getElementById('mainInput');
+  if (val) {
+    btn.classList.add('active');
+    document.getElementById('micLabel').textContent = '停止';
+    inp.placeholder = '聞いています…';
+    if (!document.getElementById('waveAnim')) {
+      const w = document.createElement('div'); w.id = 'waveAnim'; w.className = 'wave-wrap';
+      for (let i=0;i<5;i++) { const b = document.createElement('div'); b.className='wave-bar'; b.style.animationDelay=(i*0.1)+'s'; w.appendChild(b); }
+      top.insertBefore(w, top.firstChild);
+    }
+  } else {
+    btn.classList.remove('active');
+    document.getElementById('micLabel').textContent = '音声';
+    inp.placeholder = 'アイデアのタネをメモ…';
+    const w = document.getElementById('waveAnim'); if (w) w.remove();
+  }
+}
+
+// ── Export / Import ───────────────────────────────────
+function exportIdeas() {
+  if (ideas.length === 0) { alert('エクスポートするアイデアがありません。'); return; }
+  const blob = new Blob([JSON.stringify(ideas, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'ideas_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click(); URL.revokeObjectURL(url);
+}
+function importIdeas(event) {
+  const file = event.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (!Array.isArray(imported)) throw new Error();
+      if (!confirm(imported.length + ' 件のアイデアをインポートします。既存のデータと統合されます。よろしいですか？')) return;
+      const existingIds = new Set(ideas.map(i => i.id));
+      const newItems = imported.filter(i => !existingIds.has(i.id));
+      ideas = [...newItems, ...ideas];
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(ideas));
+      renderAll();
+      alert(newItems.length + ' 件をインポートしました。');
+    } catch(_) { alert('インポートに失敗しました。正しいJSONファイルを選択してください。'); }
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+// ── Render ───────────────────────────────────────────
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function renderAll() {
+  document.getElementById('ideaCount').textContent = ideas.length + ' 件のアイデア';
+  document.getElementById('emptyState').style.display = (!generating && ideas.length === 0) ? 'block' : 'none';
+  const list = document.getElementById('ideaList'); list.innerHTML = '';
+  ideas.forEach((idea, i) => {
+    const isOpen = openId === idea.id, isDetailOpen = openDetail === idea.id;
+    const card = document.createElement('div'); card.className = 'idea-card';
+    let html = `<div class="card-header" onclick="toggleCard(${idea.id})">
+      <span class="card-num">${String(ideas.length-i).padStart(2,'0')}</span>
+      <span class="card-title">${escHtml(idea.title)}</span>
+      <span class="card-date">${idea.createdAt}</span>
+      <button class="del-btn" onclick="event.stopPropagation();deleteIdea(${idea.id})" aria-label="削除">✕</button>
+      <span class="chevron ${isOpen?'open':''}">›</span>
+    </div>`;
+    if (isOpen) html += `<div class="card-summary">
+      <p class="summary-text">${escHtml(idea.summary)}</p>
+      <button class="detail-toggle" onclick="event.stopPropagation();toggleDetail(${idea.id})">${isDetailOpen?'▲ 詳細を閉じる':'▼ 詳細を見る'}</button>
+    </div>`;
+    if (isOpen && isDetailOpen) html += `<div class="card-detail">
+      <p class="detail-text">${escHtml(idea.detail)}</p>
+      <ul class="points-list">${idea.points.map(p=>`<li class="point-item"><span class="point-arrow">▸</span><span>${escHtml(p)}</span></li>`).join('')}</ul>
+      <p class="raw-note">メモ原文: ${escHtml(idea.raw)}</p>
+    </div>`;
+    card.innerHTML = html; list.appendChild(card);
+  });
+}
+
+init();
+</script>
+</body>
+</html>
