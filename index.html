@@ -100,13 +100,22 @@ body {
   border-radius: 8px; padding: 6px 10px; cursor: pointer; color: var(--ink-soft);
   font-size: 16px; -webkit-tap-highlight-color: transparent;
 }
+/* Desktop: show toolbar buttons, hide hamburger */
+.toolbar-btns { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+/* Mobile: hide toolbar buttons, show hamburger */
 @media (max-width: 540px) {
   .menu-btn { display: block; }
-  .toolbar-btns { display: none; flex-direction: column; gap: 8px; position: absolute; top: calc(var(--safe-top) + 56px); right: 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); z-index: 200; min-width: 160px; }
-  .toolbar-btns.open { display: flex; }
+  .toolbar-btns {
+    display: none !important;
+    flex-direction: column; gap: 8px;
+    position: absolute; top: calc(var(--safe-top) + 56px); right: 1rem;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1); z-index: 200; min-width: 160px;
+  }
+  .toolbar-btns.open { display: flex !important; }
   .toolbar-btns .settings-btn, .toolbar-btns label.settings-btn { width: 100%; justify-content: flex-start; text-align: left; }
 }
-.toolbar-btns { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
 
 /* Content */
 .content { max-width: var(--max-w); margin: 0 auto; padding: 1rem 1rem calc(1rem + var(--safe-bottom)); flex: 1; }
