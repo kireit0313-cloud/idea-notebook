@@ -171,9 +171,15 @@ body { background: var(--bg); font-family: 'Noto Serif JP','Hiragino Mincho ProN
     <!-- API Key section -->
     <div class="api-section">
       <p>Anthropic APIキー（AI生成に必要）</p>
-      <input class="api-input" id="apiKeyInput" type="password" placeholder="sk-ant-..." autocomplete="off"/>
-      <div id="apiError" class="api-error"></div>
-      <button class="api-save-btn" onclick="saveApiKey()">APIキーを保存</button>
+      <div id="apiRegistered" style="display:none; align-items:center; justify-content:space-between; background:#EDF6F4; border:1px solid #B2D9D3; border-radius:8px; padding:10px 12px;">
+        <span style="font-size:13px; color:#2A7B6F; font-family:'Noto Sans JP',sans-serif;">✅ APIキー登録済み</span>
+        <button onclick="showApiInput()" style="background:none; border:1px solid #B2D9D3; border-radius:6px; padding:4px 10px; font-size:11px; color:#2A7B6F; cursor:pointer; font-family:'Noto Sans JP',sans-serif;">変更</button>
+      </div>
+      <div id="apiInputArea">
+        <input class="api-input" id="apiKeyInput" type="password" placeholder="sk-ant-..." autocomplete="off"/>
+        <div id="apiError" class="api-error"></div>
+        <button class="api-save-btn" onclick="saveApiKey()">APIキーを保存</button>
+      </div>
     </div>
   </div>
 </div>
@@ -299,6 +305,7 @@ onAuthStateChanged(auth, user => {
     }
     // Load API key
     apiKey = localStorage.getItem(API_KEY_STORE) || '';
+    updateApiKeyUI();
     // Subscribe to Firestore
     subscribeIdeas(user.uid);
     // Input listener
@@ -347,8 +354,27 @@ window.saveApiKey = () => {
   apiKey = val;
   localStorage.setItem(API_KEY_STORE, apiKey);
   errEl.style.display = 'none';
+  updateApiKeyUI();
   alert('APIキーを保存しました。Googleでログインしてご利用ください。');
 };
+
+window.showApiInput = () => {
+  document.getElementById('apiRegistered').style.display = 'none';
+  document.getElementById('apiInputArea').style.display = 'block';
+  document.getElementById('apiKeyInput').value = '';
+  document.getElementById('apiKeyInput').focus();
+};
+
+function updateApiKeyUI() {
+  const saved = localStorage.getItem(API_KEY_STORE);
+  if (saved) {
+    document.getElementById('apiRegistered').style.display = 'flex';
+    document.getElementById('apiInputArea').style.display = 'none';
+  } else {
+    document.getElementById('apiRegistered').style.display = 'none';
+    document.getElementById('apiInputArea').style.display = 'block';
+  }
+}
 
 // ── AI Generation ─────────────────────────────────────
 async function generateIdeaContent(raw) {
@@ -503,6 +529,9 @@ function renderAll() {
     card.innerHTML = html; list.appendChild(card);
   });
 }
+
+// Init API key UI
+updateApiKeyUI();
 
 // ── Service Worker ────────────────────────────────────
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
