@@ -98,8 +98,8 @@ body { background: var(--bg); font-family: 'Noto Serif JP','Hiragino Mincho ProN
 /* Content */
 .content { max-width:var(--max-w); margin:0 auto; padding:1rem 1rem calc(1rem + var(--safe-bottom)); flex:1; }
 .input-box { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px 14px 10px; box-shadow:0 2px 10px rgba(0,0,0,0.05); margin-bottom:10px; }
-.input-top { display:flex; align-items:center; gap:8px; margin-bottom:10px; min-height:32px; }
-.main-input { flex:1; border:none; outline:none; font-size:16px; color:var(--ink); background:transparent; font-family:'Noto Serif JP',Georgia,serif; line-height:1.5; -webkit-appearance:none; }
+.input-top { display:flex; align-items:flex-start; gap:8px; margin-bottom:10px; min-height:32px; }
+.main-input { flex:1; border:none; outline:none; font-size:16px; color:var(--ink); background:transparent; font-family:'Noto Serif JP',Georgia,serif; line-height:1.6; -webkit-appearance:none; resize:none; overflow:hidden; min-height:28px; max-height:160px; display:block; width:100%; }
 .main-input::placeholder { color:var(--ink-faint); }
 .input-bottom { display:flex; gap:8px; justify-content:flex-end; border-top:1px solid var(--border-light); padding-top:10px; }
 .mic-btn { display:flex; align-items:center; gap:6px; padding:9px 14px; border:1px solid var(--border); border-radius:9px; background:transparent; color:var(--ink-mid); cursor:pointer; font-size:13px; font-family:'Noto Sans JP',sans-serif; -webkit-tap-highlight-color:transparent; min-height:40px; }
@@ -213,7 +213,7 @@ body { background: var(--bg); font-family: 'Noto Serif JP','Hiragino Mincho ProN
   <div class="content">
     <div class="input-box">
       <div class="input-top" id="inputTop">
-        <input class="main-input" id="mainInput" placeholder="アイデアのタネをメモ…" autocomplete="off" enterkeyhint="send"/>
+        <textarea class="main-input" id="mainInput" placeholder="アイデアのタネをメモ…" autocomplete="off" enterkeyhint="send" rows="1"></textarea>
       </div>
       <div class="input-bottom">
         <button class="mic-btn" id="micBtn" onclick="toggleMic()" style="display:none">
@@ -312,8 +312,17 @@ onAuthStateChanged(auth, user => {
     const inp = document.getElementById('mainInput');
     inp.addEventListener('input', () => {
       document.getElementById('addBtn').disabled = !inp.value.trim() || generating;
+      // Auto-resize
+      inp.style.height = 'auto';
+      inp.style.height = Math.min(inp.scrollHeight, 160) + 'px';
     });
-    inp.addEventListener('keydown', e => { if (e.key === 'Enter') handleAdd(); });
+    inp.addEventListener('keydown', e => {
+      // Shift+Enter: 改行、Enter単体: 追加
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        handleAdd();
+      }
+    });
   } else {
     document.getElementById('loadingScreen').style.display = 'flex';
     document.getElementById('app').style.display = 'none';
@@ -395,7 +404,7 @@ window.handleAdd = async () => {
   const inp = document.getElementById('mainInput');
   const raw = inp.value.trim();
   if (!raw || generating) return;
-  inp.value = ''; inp.dispatchEvent(new Event('input')); inp.blur();
+  inp.value = ''; inp.style.height = 'auto'; inp.dispatchEvent(new Event('input')); inp.blur();
   generating = true;
   setError(null);
   document.getElementById('generatingBar').style.display = 'flex';
