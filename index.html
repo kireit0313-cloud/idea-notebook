@@ -30,281 +30,180 @@
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --max-w: 640px;
 }
-
 html { height: 100%; }
-body {
-  background: var(--bg);
-  font-family: 'Noto Serif JP','Hiragino Mincho ProN',Georgia,serif;
-  min-height: 100%; min-height: 100dvh;
-  -webkit-text-size-adjust: 100%;
-}
+body { background: var(--bg); font-family: 'Noto Serif JP','Hiragino Mincho ProN',Georgia,serif; min-height:100dvh; -webkit-text-size-adjust:100%; }
 
-/* ── API Screen ── */
-#apiscreen {
-  display: flex; align-items: center; justify-content: center;
-  min-height: 100dvh; padding: max(2rem, var(--safe-top)) 1.25rem max(2rem, var(--safe-bottom));
+/* ── Loading / Login Screen ── */
+#loadingScreen {
+  display:flex; align-items:center; justify-content:center;
+  min-height:100dvh; background:var(--bg);
 }
-.api-box {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 20px; padding: 2rem 1.75rem;
-  max-width: 440px; width: 100%;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.07);
+.loading-box { text-align:center; }
+.loading-logo { width:72px; height:72px; background:var(--accent); border-radius:18px; display:flex; align-items:center; justify-content:center; font-size:34px; margin:0 auto 1.5rem; box-shadow:0 8px 24px rgba(196,101,42,0.25); }
+.loading-title { font-size:22px; font-weight:600; color:var(--ink); margin-bottom:6px; }
+.loading-sub { font-size:13px; color:var(--ink-soft); font-family:'Noto Sans JP',sans-serif; margin-bottom:2rem; }
+.google-btn {
+  display:flex; align-items:center; gap:12px; padding:13px 24px;
+  background:white; border:1px solid var(--border); border-radius:12px;
+  cursor:pointer; font-size:15px; font-family:'Noto Sans JP',sans-serif;
+  color:var(--ink); box-shadow:0 2px 8px rgba(0,0,0,0.08);
+  transition:box-shadow 0.2s; -webkit-tap-highlight-color:transparent;
+  margin:0 auto;
 }
-.api-logo {
-  width: 56px; height: 56px; background: var(--accent);
-  border-radius: 14px; display: flex; align-items: center; justify-content: center;
-  font-size: 26px; margin-bottom: 1.25rem;
-}
-.api-box h2 { font-size: 20px; color: var(--ink); margin-bottom: 6px; }
-.api-box p { font-size: 13px; color: var(--ink-soft); font-family: 'Noto Sans JP',sans-serif; line-height: 1.8; margin-bottom: 1.5rem; }
-.api-input {
-  width: 100%; padding: 12px 14px; border: 1px solid var(--border);
-  border-radius: 10px; font-size: 14px; font-family: monospace;
-  color: var(--ink); background: var(--bg); outline: none; margin-bottom: 10px;
-  -webkit-appearance: none;
-}
-.api-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(196,101,42,0.12); }
-.api-btn {
-  width: 100%; padding: 13px; background: var(--accent); color: #fff;
-  border: none; border-radius: 10px; font-size: 15px; font-weight: 500;
-  font-family: 'Noto Sans JP',sans-serif; cursor: pointer;
-  -webkit-tap-highlight-color: transparent; transition: opacity 0.15s;
-}
-.api-btn:active { opacity: 0.8; }
-.api-note { font-size: 11px; color: var(--ink-faint); font-family: 'Noto Sans JP',sans-serif; margin-top: 12px; text-align: center; }
-.api-error { font-size: 12px; color: var(--danger); font-family: 'Noto Sans JP',sans-serif; margin-top: 8px; display: none; }
+.google-btn:hover { box-shadow:0 4px 16px rgba(0,0,0,0.12); }
+.google-btn:active { opacity:0.8; }
+.google-icon { width:20px; height:20px; }
+.loading-note { font-size:11px; color:var(--ink-faint); font-family:'Noto Sans JP',sans-serif; margin-top:1rem; }
 
-/* ── App Shell ── */
-#app { display: none; min-height: 100dvh; display: none; flex-direction: column; }
+/* API Key input */
+.api-section { margin-top:1.5rem; border-top:1px solid var(--border); padding-top:1.5rem; max-width:320px; margin-left:auto; margin-right:auto; }
+.api-section p { font-size:12px; color:var(--ink-soft); font-family:'Noto Sans JP',sans-serif; margin-bottom:8px; text-align:left; }
+.api-input { width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px; font-family:monospace; color:var(--ink); background:var(--bg); outline:none; margin-bottom:8px; -webkit-appearance:none; }
+.api-input:focus { border-color:var(--accent); }
+.api-save-btn { width:100%; padding:10px; background:var(--accent); color:#fff; border:none; border-radius:8px; font-size:13px; font-family:'Noto Sans JP',sans-serif; cursor:pointer; }
+.api-error { font-size:11px; color:var(--danger); font-family:'Noto Sans JP',sans-serif; margin-top:4px; display:none; }
 
-/* Top bar */
+/* ── App ── */
+#app { display:none; min-height:100dvh; flex-direction:column; }
 .topbar {
-  background: var(--surface); border-bottom: 1px solid var(--border);
-  padding: calc(var(--safe-top) + 12px) 1.25rem 12px;
-  position: sticky; top: 0; z-index: 100;
-  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  background:var(--surface); border-bottom:1px solid var(--border);
+  padding:calc(var(--safe-top) + 12px) 1.25rem 12px;
+  position:sticky; top:0; z-index:100;
 }
-.topbar-inner { max-width: var(--max-w); margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.topbar-left { display: flex; align-items: baseline; gap: 10px; min-width: 0; }
-.app-title { font-size: 18px; font-weight: 600; color: var(--ink); white-space: nowrap; }
-.ai-badge {
-  font-size: 10px; color: var(--ink-faint); background: var(--gold-light);
-  border: 1px solid var(--border); border-radius: 99px; padding: 2px 8px;
-  font-family: 'Noto Sans JP',sans-serif; white-space: nowrap;
-}
-.idea-count { font-size: 12px; color: var(--ink-soft); font-family: 'Noto Sans JP',sans-serif; white-space: nowrap; }
+.topbar-inner { max-width:var(--max-w); margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.topbar-left { display:flex; flex-direction:column; gap:2px; min-width:0; }
+.app-title { font-size:18px; font-weight:600; color:var(--ink); }
+.user-info { font-size:11px; color:var(--ink-soft); font-family:'Noto Sans JP',sans-serif; display:flex; align-items:center; gap:6px; }
+.user-avatar { width:18px; height:18px; border-radius:50%; }
+.ai-badge { font-size:10px; color:var(--ink-faint); background:var(--gold-light); border:1px solid var(--border); border-radius:99px; padding:2px 8px; font-family:'Noto Sans JP',sans-serif; white-space:nowrap; }
+.idea-count { font-size:12px; color:var(--ink-soft); font-family:'Noto Sans JP',sans-serif; }
 
-/* Menu button (mobile) */
-.menu-btn {
-  display: none; background: none; border: 1px solid var(--border);
-  border-radius: 8px; padding: 6px 10px; cursor: pointer; color: var(--ink-soft);
-  font-size: 16px; -webkit-tap-highlight-color: transparent;
-}
-/* Desktop: show toolbar buttons, hide hamburger */
-.toolbar-btns { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
-/* Mobile: hide toolbar buttons, show hamburger */
-@media (max-width: 540px) {
-  .menu-btn { display: block; }
+/* Toolbar */
+.toolbar-btns { display:flex; gap:6px; align-items:center; flex-wrap:wrap; justify-content:flex-end; }
+.menu-btn { display:none; background:none; border:1px solid var(--border); border-radius:8px; padding:6px 10px; cursor:pointer; color:var(--ink-soft); font-size:16px; -webkit-tap-highlight-color:transparent; }
+@media (max-width:540px) {
+  .menu-btn { display:block; }
   .toolbar-btns {
-    display: none !important;
-    flex-direction: column; gap: 8px;
-    position: absolute; top: calc(var(--safe-top) + 56px); right: 1rem;
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 12px; padding: 10px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.1); z-index: 200; min-width: 160px;
+    display:none !important; flex-direction:column; gap:8px;
+    position:absolute; top:calc(var(--safe-top) + 60px); right:1rem;
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:12px; padding:10px; box-shadow:0 8px 24px rgba(0,0,0,0.1);
+    z-index:200; min-width:160px;
   }
-  .toolbar-btns.open { display: flex !important; }
-  .toolbar-btns .settings-btn, .toolbar-btns label.settings-btn { width: 100%; justify-content: flex-start; text-align: left; }
+  .toolbar-btns.open { display:flex !important; }
+  .toolbar-btns .settings-btn, .toolbar-btns label.settings-btn { width:100%; justify-content:flex-start; }
 }
+.settings-btn { padding:7px 12px; border:1px solid var(--border); border-radius:8px; background:transparent; color:var(--ink-soft); cursor:pointer; font-size:12px; font-family:'Noto Sans JP',sans-serif; white-space:nowrap; -webkit-tap-highlight-color:transparent; display:flex; align-items:center; gap:4px; }
 
 /* Content */
-.content { max-width: var(--max-w); margin: 0 auto; padding: 1rem 1rem calc(1rem + var(--safe-bottom)); flex: 1; }
+.content { max-width:var(--max-w); margin:0 auto; padding:1rem 1rem calc(1rem + var(--safe-bottom)); flex:1; }
+.input-box { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px 14px 10px; box-shadow:0 2px 10px rgba(0,0,0,0.05); margin-bottom:10px; }
+.input-top { display:flex; align-items:center; gap:8px; margin-bottom:10px; min-height:32px; }
+.main-input { flex:1; border:none; outline:none; font-size:16px; color:var(--ink); background:transparent; font-family:'Noto Serif JP',Georgia,serif; line-height:1.5; -webkit-appearance:none; }
+.main-input::placeholder { color:var(--ink-faint); }
+.input-bottom { display:flex; gap:8px; justify-content:flex-end; border-top:1px solid var(--border-light); padding-top:10px; }
+.mic-btn { display:flex; align-items:center; gap:6px; padding:9px 14px; border:1px solid var(--border); border-radius:9px; background:transparent; color:var(--ink-mid); cursor:pointer; font-size:13px; font-family:'Noto Sans JP',sans-serif; -webkit-tap-highlight-color:transparent; min-height:40px; }
+.mic-btn.active { border-color:var(--mic); background:#D9404018; color:var(--mic); }
+.add-btn { padding:9px 20px; border:1px solid var(--border); border-radius:9px; background:transparent; color:var(--ink); cursor:pointer; font-size:13px; font-family:'Noto Sans JP',sans-serif; font-weight:500; -webkit-tap-highlight-color:transparent; min-height:40px; transition:all 0.15s; }
+.add-btn:active:not(:disabled) { background:var(--accent); color:#fff; border-color:var(--accent); }
+@media (hover:hover) { .add-btn:hover:not(:disabled) { background:var(--accent); color:#fff; border-color:var(--accent); } }
+.add-btn:disabled { opacity:0.4; cursor:default; }
 
-/* Input box */
-.input-box {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 14px; padding: 14px 14px 10px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 10px;
-}
-.input-top { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; min-height: 32px; }
-.main-input {
-  flex: 1; border: none; outline: none; font-size: 16px; /* 16px prevents iOS zoom */
-  color: var(--ink); background: transparent;
-  font-family: 'Noto Serif JP',Georgia,serif; line-height: 1.5;
-  -webkit-appearance: none;
-}
-.main-input::placeholder { color: var(--ink-faint); }
-.input-bottom {
-  display: flex; gap: 8px; justify-content: flex-end;
-  border-top: 1px solid var(--border-light); padding-top: 10px;
-  flex-wrap: wrap;
-}
-.mic-btn {
-  display: flex; align-items: center; gap: 6px; padding: 9px 14px;
-  border: 1px solid var(--border); border-radius: 9px; background: transparent;
-  color: var(--ink-mid); cursor: pointer; font-size: 13px;
-  font-family: 'Noto Sans JP',sans-serif; transition: all 0.15s;
-  -webkit-tap-highlight-color: transparent; min-height: 40px;
-}
-.mic-btn.active { border-color: var(--mic); background: #D9404018; color: var(--mic); }
-.add-btn {
-  padding: 9px 20px; border: 1px solid var(--border); border-radius: 9px;
-  background: transparent; color: var(--ink); cursor: pointer; font-size: 13px;
-  font-family: 'Noto Sans JP',sans-serif; font-weight: 500; transition: all 0.15s;
-  -webkit-tap-highlight-color: transparent; min-height: 40px;
-}
-.add-btn:active:not(:disabled) { background: var(--accent); color: #fff; border-color: var(--accent); }
-@media (hover: hover) {
-  .add-btn:hover:not(:disabled) { background: var(--accent); color: #fff; border-color: var(--accent); }
-}
-.add-btn:disabled { opacity: 0.4; cursor: default; }
-.settings-btn {
-  padding: 7px 12px; border: 1px solid var(--border); border-radius: 8px;
-  background: transparent; color: var(--ink-soft); cursor: pointer; font-size: 12px;
-  font-family: 'Noto Sans JP',sans-serif; transition: all 0.15s; white-space: nowrap;
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* Feedback */
-.generating-bar {
-  background: var(--accent-light); border: 1px dashed rgba(196,101,42,0.3);
-  border-radius: 10px; padding: 12px 16px; display: flex; align-items: center;
-  gap: 10px; margin-bottom: 10px; font-size: 13px; color: var(--accent);
-  font-family: 'Noto Sans JP',sans-serif;
-}
-.error-msg { font-size: 12px; color: var(--danger); font-family: 'Noto Sans JP',sans-serif; margin-bottom: 8px; display: none; }
-.empty { text-align: center; padding: 5rem 1rem; color: var(--ink-faint); }
-.empty-icon { font-size: 36px; margin-bottom: 14px; opacity: 0.45; }
-.empty-text { font-size: 14px; font-family: 'Noto Sans JP',sans-serif; }
+.generating-bar { background:var(--accent-light); border:1px dashed rgba(196,101,42,0.3); border-radius:10px; padding:12px 16px; display:flex; align-items:center; gap:10px; margin-bottom:10px; font-size:13px; color:var(--accent); font-family:'Noto Sans JP',sans-serif; }
+.error-msg { font-size:12px; color:var(--danger); font-family:'Noto Sans JP',sans-serif; margin-bottom:8px; display:none; }
+.empty { text-align:center; padding:5rem 1rem; color:var(--ink-faint); }
+.empty-icon { font-size:36px; margin-bottom:14px; opacity:0.45; }
+.empty-text { font-size:14px; font-family:'Noto Sans JP',sans-serif; }
+.sync-indicator { font-size:11px; color:var(--teal); font-family:'Noto Sans JP',sans-serif; text-align:center; padding:6px; display:none; }
 
 /* Cards */
-.idea-list { display: flex; flex-direction: column; gap: 8px; }
-.idea-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 13px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-  transition: box-shadow 0.2s;
-}
-.card-header {
-  display: flex; align-items: center; gap: 10px; padding: 13px 14px;
-  cursor: pointer; border-left: 3px solid var(--accent); transition: background 0.15s;
-  -webkit-tap-highlight-color: transparent; user-select: none;
-}
-@media (hover: hover) { .card-header:hover { background: var(--surface-hover); } }
-.card-header:active { background: var(--surface-hover); }
-.card-num { font-size: 10px; color: var(--ink-faint); min-width: 20px; font-family: monospace; flex-shrink: 0; }
-.card-title { flex: 1; font-size: 15px; font-weight: 600; color: var(--ink); letter-spacing: -0.2px; min-width: 0; word-break: break-all; }
-.card-date { font-size: 11px; color: var(--ink-faint); font-family: 'Noto Sans JP',sans-serif; white-space: nowrap; flex-shrink: 0; }
-.del-btn {
-  background: none; border: none; color: var(--ink-faint); cursor: pointer;
-  font-size: 13px; padding: 4px 6px; transition: color 0.15s; flex-shrink: 0;
-  -webkit-tap-highlight-color: transparent; min-width: 28px; min-height: 28px;
-  display: flex; align-items: center; justify-content: center;
-}
-@media (hover: hover) { .del-btn:hover { color: var(--danger); } }
-.chevron { color: var(--ink-soft); font-size: 16px; transition: transform 0.2s; display: inline-block; flex-shrink: 0; }
-.chevron.open { transform: rotate(90deg); }
-
-.card-summary {
-  border-top: 1px solid var(--teal-border); padding: 13px 16px 13px 17px;
-  background: var(--teal-light); border-left: 3px solid var(--teal);
-}
-.summary-text { font-size: 14px; color: #1D4D47; line-height: 1.8; margin-bottom: 10px; }
-.detail-toggle {
-  background: none; border: none; font-size: 12px; color: var(--teal); cursor: pointer;
-  padding: 0; font-family: 'Noto Sans JP',sans-serif; font-weight: 600;
-  -webkit-tap-highlight-color: transparent; min-height: 32px;
-}
-
-.card-detail {
-  border-top: 1px solid var(--indigo-border); padding: 13px 16px 15px 17px;
-  background: var(--indigo-light); border-left: 3px solid var(--indigo);
-}
-.detail-text { font-size: 13px; color: #252D5C; line-height: 1.85; margin-bottom: 12px; }
-.points-list { list-style: none; padding: 0; margin: 0 0 12px; display: flex; flex-direction: column; gap: 7px; }
-.point-item { display: flex; gap: 8px; font-size: 13px; color: #3A4280; line-height: 1.65; font-family: 'Noto Sans JP',sans-serif; }
-.point-arrow { color: var(--indigo); font-weight: 700; flex-shrink: 0; }
-.raw-note { font-size: 11px; color: var(--ink-faint); border-top: 1px solid var(--indigo-border); padding-top: 9px; font-family: 'Noto Sans JP',sans-serif; }
+.idea-list { display:flex; flex-direction:column; gap:8px; }
+.idea-card { background:var(--surface); border:1px solid var(--border); border-radius:13px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,0.04); }
+.card-header { display:flex; align-items:center; gap:10px; padding:13px 14px; cursor:pointer; border-left:3px solid var(--accent); -webkit-tap-highlight-color:transparent; user-select:none; }
+@media (hover:hover) { .card-header:hover { background:var(--surface-hover); } }
+.card-header:active { background:var(--surface-hover); }
+.card-num { font-size:10px; color:var(--ink-faint); min-width:20px; font-family:monospace; flex-shrink:0; }
+.card-title { flex:1; font-size:15px; font-weight:600; color:var(--ink); min-width:0; word-break:break-all; }
+.card-date { font-size:11px; color:var(--ink-faint); font-family:'Noto Sans JP',sans-serif; white-space:nowrap; flex-shrink:0; }
+.del-btn { background:none; border:none; color:var(--ink-faint); cursor:pointer; font-size:13px; padding:4px 6px; flex-shrink:0; -webkit-tap-highlight-color:transparent; min-width:28px; min-height:28px; display:flex; align-items:center; justify-content:center; }
+.chevron { color:var(--ink-soft); font-size:16px; transition:transform 0.2s; display:inline-block; flex-shrink:0; }
+.chevron.open { transform:rotate(90deg); }
+.card-summary { border-top:1px solid var(--teal-border); padding:13px 16px 13px 17px; background:var(--teal-light); border-left:3px solid var(--teal); }
+.summary-text { font-size:14px; color:#1D4D47; line-height:1.8; margin-bottom:10px; }
+.detail-toggle { background:none; border:none; font-size:12px; color:var(--teal); cursor:pointer; padding:0; font-family:'Noto Sans JP',sans-serif; font-weight:600; min-height:32px; }
+.card-detail { border-top:1px solid var(--indigo-border); padding:13px 16px 15px 17px; background:var(--indigo-light); border-left:3px solid var(--indigo); }
+.detail-text { font-size:13px; color:#252D5C; line-height:1.85; margin-bottom:12px; }
+.points-list { list-style:none; padding:0; margin:0 0 12px; display:flex; flex-direction:column; gap:7px; }
+.point-item { display:flex; gap:8px; font-size:13px; color:#3A4280; line-height:1.65; font-family:'Noto Sans JP',sans-serif; }
+.point-arrow { color:var(--indigo); font-weight:700; flex-shrink:0; }
+.raw-note { font-size:11px; color:var(--ink-faint); border-top:1px solid var(--indigo-border); padding-top:9px; font-family:'Noto Sans JP',sans-serif; }
 
 /* Animations */
-.wave-wrap { display: flex; align-items: center; gap: 3px; height: 20px; }
-.wave-bar { width: 3px; background: var(--mic); border-radius: 2px; animation: wave 0.8s ease-in-out infinite; }
+.wave-wrap { display:flex; align-items:center; gap:3px; height:20px; }
+.wave-bar { width:3px; background:var(--mic); border-radius:2px; animation:wave 0.8s ease-in-out infinite; }
 @keyframes wave { 0%,100%{height:4px} 50%{height:16px} }
-.dots-wrap { display: flex; gap: 5px; align-items: center; }
-.dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); animation: blink 1.2s ease-in-out infinite; }
+.dots-wrap { display:flex; gap:5px; align-items:center; }
+.dot { width:5px; height:5px; border-radius:50%; background:var(--accent); animation:blink 1.2s ease-in-out infinite; }
 @keyframes blink { 0%,100%{opacity:0.2} 50%{opacity:1} }
 
-/* Install banner */
-#installBanner {
-  display: none; align-items: center; justify-content: space-between; gap: 10px;
-  background: var(--accent); color: #fff; padding: 10px 14px;
-  font-family: 'Noto Sans JP',sans-serif; font-size: 13px;
-}
-#installBanner button {
-  background: rgba(255,255,255,0.25); border: none; color: #fff;
-  padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px;
-  font-family: 'Noto Sans JP',sans-serif; white-space: nowrap;
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* Responsive tweaks */
-@media (max-width: 400px) {
-  .card-date { display: none; }
-  .app-title { font-size: 16px; }
-  .ai-badge { display: none; }
-}
+@media (max-width:400px) { .card-date { display:none; } .app-title { font-size:16px; } .ai-badge { display:none; } }
 </style>
 </head>
 <body>
 
-<!-- API Key Screen -->
-<div id="apiscreen">
-  <div class="api-box">
-    <div class="api-logo">🗒</div>
-    <h2>アイデア帳</h2>
-    <p>ご利用にはAnthropicのAPIキーが必要です。<br>キーはこの端末のブラウザ内にのみ保存されます。</p>
-    <input class="api-input" id="apiKeyInput" type="password" placeholder="sk-ant-..." autocomplete="off" inputmode="text"/>
-    <div id="apiError" class="api-error"></div>
-    <button class="api-btn" onclick="saveApiKey()">はじめる</button>
-    <p class="api-note">APIキーは <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com</a> で取得できます</p>
+<!-- Loading / Login Screen -->
+<div id="loadingScreen">
+  <div class="loading-box">
+    <div class="loading-logo">🗒</div>
+    <div class="loading-title">アイデア帳</div>
+    <div class="loading-sub">AIがアイデアを自動展開するメモアプリ</div>
+    <button class="google-btn" onclick="signInWithGoogle()">
+      <svg class="google-icon" viewBox="0 0 24 24">
+        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+      </svg>
+      Googleでログイン
+    </button>
+    <p class="loading-note">ログインするとすべての端末でデータが同期されます</p>
+
+    <!-- API Key section -->
+    <div class="api-section">
+      <p>Anthropic APIキー（AI生成に必要）</p>
+      <input class="api-input" id="apiKeyInput" type="password" placeholder="sk-ant-..." autocomplete="off"/>
+      <div id="apiError" class="api-error"></div>
+      <button class="api-save-btn" onclick="saveApiKey()">APIキーを保存</button>
+    </div>
   </div>
 </div>
 
 <!-- Main App -->
 <div id="app" style="display:none">
-
-  <!-- Install Banner -->
-  <div id="installBanner">
-    <span>📱 ホーム画面に追加してアプリとして使えます</span>
-    <div style="display:flex;gap:8px">
-      <button onclick="installApp()">追加する</button>
-      <button onclick="dismissBanner()">✕</button>
-    </div>
-  </div>
-
-  <!-- Top bar -->
   <div class="topbar">
     <div class="topbar-inner">
-      <div>
-        <div class="topbar-left">
+      <div class="topbar-left">
+        <div style="display:flex;align-items:center;gap:8px">
           <span class="app-title">アイデア帳</span>
           <span class="ai-badge">AI 自動生成</span>
         </div>
-        <div class="idea-count" id="ideaCount">0 件のアイデア</div>
+        <div class="user-info">
+          <img class="user-avatar" id="userAvatar" src="" alt="" style="display:none"/>
+          <span id="userName"></span>
+          <span class="idea-count" id="ideaCount">0 件</span>
+        </div>
       </div>
-      <!-- Desktop toolbar -->
       <div class="toolbar-btns" id="toolbarBtns">
-        <button class="settings-btn" onclick="changeApiKey();closeMenu()">⚙ キー変更</button>
         <button class="settings-btn" onclick="exportIdeas();closeMenu()">📤 エクスポート</button>
-        <label class="settings-btn" style="cursor:pointer;display:flex;align-items:center">
+        <label class="settings-btn" style="cursor:pointer">
           📥 インポート<input type="file" accept=".json" onchange="importIdeas(event)" style="display:none"/>
         </label>
+        <button class="settings-btn" onclick="signOut();closeMenu()">🚪 ログアウト</button>
       </div>
-      <!-- Mobile hamburger -->
       <button class="menu-btn" onclick="toggleMenu()" aria-label="メニュー">☰</button>
     </div>
   </div>
 
-  <!-- Content -->
   <div class="content">
     <div class="input-box">
       <div class="input-top" id="inputTop">
@@ -319,6 +218,7 @@ body {
       </div>
     </div>
     <div id="errorMsg" class="error-msg"></div>
+    <div id="syncIndicator" class="sync-indicator">☁ 同期中…</div>
     <div id="generatingBar" class="generating-bar" style="display:none">
       <div class="dots-wrap">
         <div class="dot" style="animation-delay:0s"></div>
@@ -335,100 +235,128 @@ body {
   </div>
 </div>
 
-<script>
-const STORAGE_KEY = 'idea-notebook-pwa-v1';
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut as fbSignOut }
+  from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
+import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, query, orderBy }
+  from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyATf8RjZ7y_wjiiPJ1VR9KXktbDPXuMpFo",
+  authDomain: "idea-notebook-172e0.firebaseapp.com",
+  projectId: "idea-notebook-172e0",
+  storageBucket: "idea-notebook-172e0.firebasestorage.app",
+  messagingSenderId: "682338340449",
+  appId: "1:682338340449:web:598a4db429e148990e6420"
+};
+
+const fbApp  = initializeApp(firebaseConfig);
+const auth   = getAuth(fbApp);
+const db     = getFirestore(fbApp);
+const provider = new GoogleAuthProvider();
+
 const API_KEY_STORE = 'idea-notebook-apikey';
 let ideas = [], openId = null, openDetail = null, generating = false;
-let listening = false, recognition = null, apiKey = '';
-let deferredInstall = null;
+let listening = false, recognition = null, apiKey = '', currentUser = null;
+let unsubscribe = null;
 
-// ── PWA Install ──────────────────────────────────────
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  deferredInstall = e;
-  if (!localStorage.getItem('installDismissed')) {
-    document.getElementById('installBanner').style.display = 'flex';
+// ── Auth ──────────────────────────────────────────────
+window.signInWithGoogle = async () => {
+  try {
+    await signInWithPopup(auth, provider);
+  } catch(e) {
+    console.error(e);
+    alert('ログインに失敗しました。もう一度お試しください。');
+  }
+};
+
+window.signOut = async () => {
+  if (!confirm('ログアウトしますか？')) return;
+  if (unsubscribe) unsubscribe();
+  await fbSignOut(auth);
+  ideas = []; openId = null; openDetail = null; currentUser = null;
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('loadingScreen').style.display = 'flex';
+};
+
+onAuthStateChanged(auth, user => {
+  if (user) {
+    currentUser = user;
+    // Show app
+    document.getElementById('loadingScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    // User info
+    document.getElementById('userName').textContent = user.displayName || user.email;
+    if (user.photoURL) {
+      const av = document.getElementById('userAvatar');
+      av.src = user.photoURL; av.style.display = 'block';
+    }
+    // Mic
+    if (window.SpeechRecognition || window.webkitSpeechRecognition) {
+      document.getElementById('micBtn').style.display = 'flex';
+    }
+    // Load API key
+    apiKey = localStorage.getItem(API_KEY_STORE) || '';
+    // Subscribe to Firestore
+    subscribeIdeas(user.uid);
+    // Input listener
+    const inp = document.getElementById('mainInput');
+    inp.addEventListener('input', () => {
+      document.getElementById('addBtn').disabled = !inp.value.trim() || generating;
+    });
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') handleAdd(); });
+  } else {
+    document.getElementById('loadingScreen').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
+    // Pre-fill API key if saved
+    const saved = localStorage.getItem(API_KEY_STORE);
+    if (saved) document.getElementById('apiKeyInput').value = saved;
   }
 });
-function installApp() {
-  if (!deferredInstall) return;
-  deferredInstall.prompt();
-  deferredInstall.userChoice.then(() => { dismissBanner(); deferredInstall = null; });
-}
-function dismissBanner() {
-  document.getElementById('installBanner').style.display = 'none';
-  localStorage.setItem('installDismissed', '1');
-}
 
-// ── Service Worker ───────────────────────────────────
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
-}
-
-// ── Init ─────────────────────────────────────────────
-function init() {
-  apiKey = localStorage.getItem(API_KEY_STORE) || '';
-  if (apiKey) showApp();
-  if (window.SpeechRecognition || window.webkitSpeechRecognition) {
-    document.getElementById('micBtn').style.display = 'flex';
-  }
-  try { const s = localStorage.getItem(STORAGE_KEY); if (s) ideas = JSON.parse(s); } catch(_) {}
-  renderAll();
-  const inp = document.getElementById('mainInput');
-  inp.addEventListener('input', () => {
-    document.getElementById('addBtn').disabled = !inp.value.trim() || generating;
-  });
-  inp.addEventListener('keydown', e => { if (e.key === 'Enter') handleAdd(); });
-  // Close menu on outside click
-  document.addEventListener('click', e => {
-    const tb = document.getElementById('toolbarBtns');
-    if (tb && tb.classList.contains('open') && !tb.contains(e.target) && !e.target.closest('.menu-btn')) {
-      tb.classList.remove('open');
-    }
+// ── Firestore ─────────────────────────────────────────
+function subscribeIdeas(uid) {
+  if (unsubscribe) unsubscribe();
+  const q = query(collection(db, 'users', uid, 'ideas'), orderBy('id', 'desc'));
+  unsubscribe = onSnapshot(q, snapshot => {
+    ideas = snapshot.docs.map(d => d.data());
+    renderAll();
   });
 }
 
-function toggleMenu() {
-  document.getElementById('toolbarBtns').classList.toggle('open');
-}
-function closeMenu() {
-  document.getElementById('toolbarBtns').classList.remove('open');
+async function saveIdeaToDb(idea) {
+  if (!currentUser) return;
+  const ref = doc(db, 'users', currentUser.uid, 'ideas', String(idea.id));
+  await setDoc(ref, idea);
 }
 
-// ── API Key ──────────────────────────────────────────
-function saveApiKey() {
+async function deleteIdeaFromDb(id) {
+  if (!currentUser) return;
+  const ref = doc(db, 'users', currentUser.uid, 'ideas', String(id));
+  await deleteDoc(ref);
+}
+
+// ── API Key ───────────────────────────────────────────
+window.saveApiKey = () => {
   const val = document.getElementById('apiKeyInput').value.trim();
   const errEl = document.getElementById('apiError');
   if (!val) { errEl.textContent = 'APIキーを入力してください'; errEl.style.display = 'block'; return; }
-  if (!val.startsWith('sk-ant-')) { errEl.textContent = 'APIキーは sk-ant- から始まる文字列です'; errEl.style.display = 'block'; return; }
+  if (!val.startsWith('sk-ant-')) { errEl.textContent = 'sk-ant- から始まる文字列を入力してください'; errEl.style.display = 'block'; return; }
   apiKey = val;
   localStorage.setItem(API_KEY_STORE, apiKey);
   errEl.style.display = 'none';
-  showApp();
-}
-function changeApiKey() {
-  document.getElementById('apiKeyInput').value = '';
-  document.getElementById('apiError').style.display = 'none';
-  document.getElementById('apiscreen').style.display = 'flex';
-  document.getElementById('app').style.display = 'none';
-}
-function showApp() {
-  document.getElementById('apiscreen').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
-  setTimeout(() => document.getElementById('mainInput').focus(), 100);
-}
+  alert('APIキーを保存しました。Googleでログインしてご利用ください。');
+};
 
-// ── AI Generation ────────────────────────────────────
+// ── AI Generation ─────────────────────────────────────
 async function generateIdeaContent(raw) {
+  if (!apiKey) throw new Error('APIキーが設定されていません。ログイン画面でAPIキーを入力してください。');
   const prompt = `以下のメモからアイデア帳のエントリを日本語で生成してください。\nメモ: 「${raw}」\n\n以下のJSONのみを返してください（前置き・コードブロック不要）:\n{\n  "title": "アイデアのタイトル（20文字以内、体言止め）",\n  "summary": "60〜80文字のサマリー（このアイデアが何で、なぜ面白いか）",\n  "detail": "150〜200文字の詳細説明（可能性・課題・アプローチ）",\n  "points": ["具体的なアクション・特徴1", "具体的なアクション・特徴2", "具体的なアクション・特徴3"]\n}`;
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true'
-    },
+    headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
     body: JSON.stringify({ model: 'claude-sonnet-4-5', max_tokens: 1000, messages: [{ role: 'user', content: prompt }] })
   });
   const data = await res.json();
@@ -437,13 +365,11 @@ async function generateIdeaContent(raw) {
   return JSON.parse(text.replace(/```json|```/g, '').trim());
 }
 
-async function handleAdd() {
+window.handleAdd = async () => {
   const inp = document.getElementById('mainInput');
   const raw = inp.value.trim();
   if (!raw || generating) return;
-  inp.value = ''; inp.dispatchEvent(new Event('input'));
-  // Blur on mobile to hide keyboard
-  inp.blur();
+  inp.value = ''; inp.dispatchEvent(new Event('input')); inp.blur();
   generating = true;
   setError(null);
   document.getElementById('generatingBar').style.display = 'flex';
@@ -451,10 +377,8 @@ async function handleAdd() {
   try {
     const content = await generateIdeaContent(raw);
     const idea = { id: Date.now(), raw, ...content, createdAt: new Date().toLocaleDateString('ja-JP') };
-    ideas.unshift(idea);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(ideas));
+    await saveIdeaToDb(idea);
     openId = idea.id; openDetail = null;
-    renderAll();
   } catch(e) {
     console.error(e);
     setError('エラー: ' + (e.message || '生成に失敗しました'));
@@ -462,25 +386,24 @@ async function handleAdd() {
     generating = false;
     document.getElementById('generatingBar').style.display = 'none';
   }
-}
+};
 
-// ── Card Actions ─────────────────────────────────────
-function deleteIdea(id) {
+// ── Card Actions ──────────────────────────────────────
+window.deleteIdea = async (id) => {
   if (!confirm('このアイデアを削除しますか？')) return;
-  ideas = ideas.filter(i => i.id !== id);
+  await deleteIdeaFromDb(id);
   if (openId === id) { openId = null; openDetail = null; }
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(ideas));
-  renderAll();
-}
-function toggleCard(id) { openId = openId === id ? null : id; openDetail = null; renderAll(); }
-function toggleDetail(id) { openDetail = openDetail === id ? null : id; renderAll(); }
+};
+window.toggleCard = (id) => { openId = openId === id ? null : id; openDetail = null; renderAll(); };
+window.toggleDetail = (id) => { openDetail = openDetail === id ? null : id; renderAll(); };
+
 function setError(msg) {
   const el = document.getElementById('errorMsg');
   if (msg) { el.textContent = msg; el.style.display = 'block'; } else { el.style.display = 'none'; }
 }
 
-// ── Mic ──────────────────────────────────────────────
-function toggleMic() {
+// ── Mic ───────────────────────────────────────────────
+window.toggleMic = () => {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) return;
   if (listening) { recognition && recognition.stop(); setListeningUI(false); return; }
@@ -493,65 +416,69 @@ function toggleMic() {
   };
   recognition.onend = () => setListeningUI(false);
   recognition.onerror = () => { setListeningUI(false); setError('マイクへのアクセスに失敗しました。'); };
-  recognition.start();
-  setListeningUI(true);
-}
+  recognition.start(); setListeningUI(true);
+};
 function setListeningUI(val) {
   listening = val;
-  const btn = document.getElementById('micBtn');
-  const top = document.getElementById('inputTop');
+  const btn = document.getElementById('micBtn'), top = document.getElementById('inputTop');
   const inp = document.getElementById('mainInput');
   if (val) {
-    btn.classList.add('active');
-    document.getElementById('micLabel').textContent = '停止';
+    btn.classList.add('active'); document.getElementById('micLabel').textContent = '停止';
     inp.placeholder = '聞いています…';
     if (!document.getElementById('waveAnim')) {
-      const w = document.createElement('div'); w.id = 'waveAnim'; w.className = 'wave-wrap';
-      for (let i=0;i<5;i++) { const b = document.createElement('div'); b.className='wave-bar'; b.style.animationDelay=(i*0.1)+'s'; w.appendChild(b); }
+      const w = document.createElement('div'); w.id='waveAnim'; w.className='wave-wrap';
+      for (let i=0;i<5;i++) { const b=document.createElement('div'); b.className='wave-bar'; b.style.animationDelay=(i*0.1)+'s'; w.appendChild(b); }
       top.insertBefore(w, top.firstChild);
     }
   } else {
-    btn.classList.remove('active');
-    document.getElementById('micLabel').textContent = '音声';
+    btn.classList.remove('active'); document.getElementById('micLabel').textContent = '音声';
     inp.placeholder = 'アイデアのタネをメモ…';
     const w = document.getElementById('waveAnim'); if (w) w.remove();
   }
 }
 
 // ── Export / Import ───────────────────────────────────
-function exportIdeas() {
+window.exportIdeas = () => {
   if (ideas.length === 0) { alert('エクスポートするアイデアがありません。'); return; }
   const blob = new Blob([JSON.stringify(ideas, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url; a.download = 'ideas_' + new Date().toISOString().slice(0,10) + '.json';
   a.click(); URL.revokeObjectURL(url);
-}
-function importIdeas(event) {
+};
+window.importIdeas = async (event) => {
   const file = event.target.files[0]; if (!file) return;
   const reader = new FileReader();
-  reader.onload = e => {
+  reader.onload = async e => {
     try {
       const imported = JSON.parse(e.target.result);
       if (!Array.isArray(imported)) throw new Error();
-      if (!confirm(imported.length + ' 件のアイデアをインポートします。既存のデータと統合されます。よろしいですか？')) return;
+      if (!confirm(imported.length + ' 件のアイデアをインポートします。よろしいですか？')) return;
       const existingIds = new Set(ideas.map(i => i.id));
       const newItems = imported.filter(i => !existingIds.has(i.id));
-      ideas = [...newItems, ...ideas];
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(ideas));
-      renderAll();
+      for (const idea of newItems) await saveIdeaToDb(idea);
       alert(newItems.length + ' 件をインポートしました。');
-    } catch(_) { alert('インポートに失敗しました。正しいJSONファイルを選択してください。'); }
+    } catch(_) { alert('インポートに失敗しました。'); }
     event.target.value = '';
   };
   reader.readAsText(file);
-}
+};
 
-// ── Render ───────────────────────────────────────────
+// ── Menu ──────────────────────────────────────────────
+window.toggleMenu = () => document.getElementById('toolbarBtns').classList.toggle('open');
+window.closeMenu = () => document.getElementById('toolbarBtns').classList.remove('open');
+document.addEventListener('click', e => {
+  const tb = document.getElementById('toolbarBtns');
+  if (tb && tb.classList.contains('open') && !tb.contains(e.target) && !e.target.closest('.menu-btn')) {
+    tb.classList.remove('open');
+  }
+});
+
+// ── Render ────────────────────────────────────────────
 function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 function renderAll() {
-  document.getElementById('ideaCount').textContent = ideas.length + ' 件のアイデア';
+  document.getElementById('ideaCount').textContent = ideas.length + ' 件';
   document.getElementById('emptyState').style.display = (!generating && ideas.length === 0) ? 'block' : 'none';
   const list = document.getElementById('ideaList'); list.innerHTML = '';
   ideas.forEach((idea, i) => {
@@ -577,7 +504,8 @@ function renderAll() {
   });
 }
 
-init();
+// ── Service Worker ────────────────────────────────────
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
 </body>
 </html>
