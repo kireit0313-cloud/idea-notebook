@@ -55,14 +55,6 @@ body { background: var(--bg); font-family: 'Noto Serif JP','Hiragino Mincho ProN
 .google-icon { width:20px; height:20px; }
 .loading-note { font-size:11px; color:var(--ink-faint); font-family:'Noto Sans JP',sans-serif; margin-top:1rem; }
 
-/* API Key input */
-.api-section { margin-top:1.5rem; border-top:1px solid var(--border); padding-top:1.5rem; max-width:320px; margin-left:auto; margin-right:auto; }
-.api-section p { font-size:12px; color:var(--ink-soft); font-family:'Noto Sans JP',sans-serif; margin-bottom:8px; text-align:left; }
-.api-input { width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px; font-family:monospace; color:var(--ink); background:var(--bg); outline:none; margin-bottom:8px; -webkit-appearance:none; }
-.api-input:focus { border-color:var(--accent); }
-.api-save-btn { width:100%; padding:10px; background:var(--accent); color:#fff; border:none; border-radius:8px; font-size:13px; font-family:'Noto Sans JP',sans-serif; cursor:pointer; }
-.api-error { font-size:11px; color:var(--danger); font-family:'Noto Sans JP',sans-serif; margin-top:4px; display:none; }
-
 /* ── App ── */
 #app { display:none; min-height:100dvh; flex-direction:column; }
 .topbar {
@@ -167,20 +159,6 @@ body { background: var(--bg); font-family: 'Noto Serif JP','Hiragino Mincho ProN
       Googleでログイン
     </button>
     <p class="loading-note">ログインするとすべての端末でデータが同期されます</p>
-
-    <!-- API Key section -->
-    <div class="api-section">
-      <p>Anthropic APIキー（AI生成に必要）</p>
-      <div id="apiRegistered" style="display:none; align-items:center; justify-content:space-between; background:#EDF6F4; border:1px solid #B2D9D3; border-radius:8px; padding:10px 12px;">
-        <span style="font-size:13px; color:#2A7B6F; font-family:'Noto Sans JP',sans-serif;">✅ APIキー登録済み</span>
-        <button onclick="showApiInput()" style="background:none; border:1px solid #B2D9D3; border-radius:6px; padding:4px 10px; font-size:11px; color:#2A7B6F; cursor:pointer; font-family:'Noto Sans JP',sans-serif;">変更</button>
-      </div>
-      <div id="apiInputArea">
-        <input class="api-input" id="apiKeyInput" type="password" placeholder="sk-ant-..." autocomplete="off"/>
-        <div id="apiError" class="api-error"></div>
-        <button class="api-save-btn" onclick="saveApiKey()">APIキーを保存</button>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -263,9 +241,9 @@ const auth   = getAuth(fbApp);
 const db     = getFirestore(fbApp);
 const provider = new GoogleAuthProvider();
 
-const API_KEY_STORE = 'idea-notebook-apikey';
+const GENERATE_FN_URL = 'https://generate-idea-682338340449.asia-northeast1.run.app';
 let ideas = [], openId = null, openDetail = null, generating = false;
-let listening = false, recognition = null, apiKey = '', currentUser = null;
+let listening = false, recognition = null, currentUser = null;
 let unsubscribe = null;
 
 // ── Auth ──────────────────────────────────────────────
@@ -303,9 +281,6 @@ onAuthStateChanged(auth, user => {
     if (window.SpeechRecognition || window.webkitSpeechRecognition) {
       document.getElementById('micBtn').style.display = 'flex';
     }
-    // Load API key
-    apiKey = localStorage.getItem(API_KEY_STORE) || '';
-    updateApiKeyUI();
     // Subscribe to Firestore
     subscribeIdeas(user.uid);
     // Input listener
@@ -326,9 +301,6 @@ onAuthStateChanged(auth, user => {
   } else {
     document.getElementById('loadingScreen').style.display = 'flex';
     document.getElementById('app').style.display = 'none';
-    // Pre-fill API key if saved
-    const saved = localStorage.getItem(API_KEY_STORE);
-    if (saved) document.getElementById('apiKeyInput').value = saved;
   }
 });
 
@@ -354,50 +326,21 @@ async function deleteIdeaFromDb(id) {
   await deleteDoc(ref);
 }
 
-// ── API Key ───────────────────────────────────────────
-window.saveApiKey = () => {
-  const val = document.getElementById('apiKeyInput').value.trim();
-  const errEl = document.getElementById('apiError');
-  if (!val) { errEl.textContent = 'APIキーを入力してください'; errEl.style.display = 'block'; return; }
-  if (!val.startsWith('sk-ant-')) { errEl.textContent = 'sk-ant- から始まる文字列を入力してください'; errEl.style.display = 'block'; return; }
-  apiKey = val;
-  localStorage.setItem(API_KEY_STORE, apiKey);
-  errEl.style.display = 'none';
-  updateApiKeyUI();
-  alert('APIキーを保存しました。Googleでログインしてご利用ください。');
-};
-
-window.showApiInput = () => {
-  document.getElementById('apiRegistered').style.display = 'none';
-  document.getElementById('apiInputArea').style.display = 'block';
-  document.getElementById('apiKeyInput').value = '';
-  document.getElementById('apiKeyInput').focus();
-};
-
-function updateApiKeyUI() {
-  const saved = localStorage.getItem(API_KEY_STORE);
-  if (saved) {
-    document.getElementById('apiRegistered').style.display = 'flex';
-    document.getElementById('apiInputArea').style.display = 'none';
-  } else {
-    document.getElementById('apiRegistered').style.display = 'none';
-    document.getElementById('apiInputArea').style.display = 'block';
-  }
-}
-
 // ── AI Generation ─────────────────────────────────────
 async function generateIdeaContent(raw) {
-  if (!apiKey) throw new Error('APIキーが設定されていません。ログイン画面でAPIキーを入力してください。');
-  const prompt = `以下のメモからアイデア帳のエントリを日本語で生成してください。\nメモ: 「${raw}」\n\n以下のJSONのみを返してください（前置き・コードブロック不要）:\n{\n  "title": "アイデアのタイトル（20文字以内、体言止め）",\n  "summary": "60〜80文字のサマリー（このアイデアが何で、なぜ面白いか）",\n  "detail": "150〜200文字の詳細説明（可能性・課題・アプローチ）",\n  "points": ["具体的なアクション・特徴1", "具体的なアクション・特徴2", "具体的なアクション・特徴3"]\n}`;
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
+  if (!currentUser) throw new Error('ログインが必要です。');
+  const idToken = await currentUser.getIdToken();
+  const res = await fetch(GENERATE_FN_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-    body: JSON.stringify({ model: 'claude-sonnet-4-5', max_tokens: 1000, messages: [{ role: 'user', content: prompt }] })
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + idToken
+    },
+    body: JSON.stringify({ raw })
   });
   const data = await res.json();
-  if (data.error) throw new Error(data.error.message);
-  const text = data.content.map(b => b.text || '').join('');
-  return JSON.parse(text.replace(/```json|```/g, '').trim());
+  if (data.error) throw new Error(data.error);
+  return data;
 }
 
 window.handleAdd = async () => {
@@ -538,9 +481,6 @@ function renderAll() {
     card.innerHTML = html; list.appendChild(card);
   });
 }
-
-// Init API key UI
-updateApiKeyUI();
 
 // ── Service Worker ────────────────────────────────────
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
