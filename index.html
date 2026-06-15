@@ -339,7 +339,11 @@ async function generateIdeaContent(raw) {
     body: JSON.stringify({ raw })
   });
   const data = await res.json();
-  if (data.error) throw new Error(data.error);
+  if (data.error) {
+    const err = new Error(data.error);
+    err.status = res.status;
+    throw err;
+  }
   return data;
 }
 
@@ -359,7 +363,11 @@ window.handleAdd = async () => {
     openId = idea.id; openDetail = null;
   } catch(e) {
     console.error(e);
-    setError('エラー: ' + (e.message || '生成に失敗しました'));
+    if (e.status === 429) {
+      setError(e.message);
+    } else {
+      setError('エラー: ' + (e.message || '生成に失敗しました'));
+    }
   } finally {
     generating = false;
     document.getElementById('generatingBar').style.display = 'none';
