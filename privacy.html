@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>プライバシーポリシー — アイデア帳</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600&family=Noto+Sans+JP:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #FDFAF6; --ink: #2C2416; --ink-mid: #6B5D4E; --ink-soft: #9E8E7E;
+  --accent: #C4652A; --border: #E8E0D4; --teal: #2A7B6F;
+}
+body { background: var(--bg); color: var(--ink); font-family: 'Noto Serif JP', serif; line-height: 1.85; }
+.container { max-width: 680px; margin: 0 auto; padding: 48px 24px 80px; }
+.back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--accent); font-family: 'Noto Sans JP', sans-serif; font-size: 13px; text-decoration: none; margin-bottom: 32px; }
+.back-link:hover { opacity: 0.75; }
+h1 { font-size: 22px; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
+.updated { font-size: 12px; color: var(--ink-soft); font-family: 'Noto Sans JP', sans-serif; margin-bottom: 40px; }
+h2 { font-size: 15px; font-weight: 600; color: var(--teal); font-family: 'Noto Sans JP', sans-serif; margin: 36px 0 10px; border-left: 3px solid var(--teal); padding-left: 10px; }
+p { font-size: 14px; color: var(--ink-mid); margin-bottom: 12px; }
+ul { padding-left: 20px; margin-bottom: 12px; }
+li { font-size: 14px; color: var(--ink-mid); margin-bottom: 6px; }
+table { width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 13px; }
+th { background: #EDF6F4; color: var(--teal); font-family: 'Noto Sans JP', sans-serif; font-weight: 500; padding: 10px 12px; border: 1px solid #B2D9D3; text-align: left; }
+td { padding: 10px 12px; border: 1px solid var(--border); color: var(--ink-mid); vertical-align: top; }
+.contact { background: #FFF1E8; border: 1px solid #E8D0B8; border-radius: 10px; padding: 16px 20px; margin-top: 12px; font-family: 'Noto Sans JP', sans-serif; font-size: 13px; color: var(--ink-mid); }
+.contact a { color: var(--accent); }
+hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+</style>
+</head>
+<body>
+<div class="container">
+  <a class="back-link" href="/">← アイデア帳に戻る</a>
+  <h1>プライバシーポリシー</h1>
+  <p class="updated">制定日：2026年6月15日</p>
+
+  <p>本プライバシーポリシーは、アイデア帳（以下「本サービス」）が収集する情報の種類、利用目的、および管理方法についてご説明するものです。</p>
+
+  <h2>1. 収集する情報</h2>
+  <p>本サービスでは、以下の情報を収集します。</p>
+  <table>
+    <tr>
+      <th>情報の種類</th>
+      <th>収集方法</th>
+      <th>内容</th>
+    </tr>
+    <tr>
+      <td>Googleアカウント情報</td>
+      <td>Googleログイン時に自動取得</td>
+      <td>ユーザーID（UID）、メールアドレス、表示名</td>
+    </tr>
+    <tr>
+      <td>メモ・アイデアデータ</td>
+      <td>ユーザーが入力</td>
+      <td>入力されたメモの文章、AIが生成したタイトル・サマリー・詳細・アクションポイント</td>
+    </tr>
+    <tr>
+      <td>利用状況データ</td>
+      <td>サービス利用時に自動記録</td>
+      <td>AI生成機能の利用回数（日次）</td>
+    </tr>
+  </table>
+
+  <h2>2. 情報の利用目的</h2>
+  <p>収集した情報は以下の目的のみに使用します。</p>
+  <ul>
+    <li>本サービスの提供（アイデアの保存・表示・同期）</li>
+    <li>ユーザー認証およびアカウント管理</li>
+    <li>AI生成機能の利用回数の管理（利用制限の適用）</li>
+    <li>サービスの改善および不正利用の防止</li>
+  </ul>
+  <p>収集した情報を、上記以外の目的で使用したり、第三者に販売・提供することはありません。</p>
+
+  <h2>3. 情報の保存先</h2>
+  <p>ユーザーのデータは、Google Cloud Platform（Firestore）に保存されます。データはGoogle社のセキュリティ基準に基づき管理されています。</p>
+
+  <h2>4. AIへの情報送信について</h2>
+  <p>ユーザーが入力したメモは、AI（Anthropic Claude API）に送信され、タイトル・サマリー・詳細・アクションポイントの生成に使用されます。送信されるのは入力されたテキストのみであり、Googleアカウント情報は送信されません。</p>
+  <p>Anthropicのプライバシーポリシーについては、<a href="https://www.anthropic.com/privacy" target="_blank" rel="noopener">Anthropic社のウェブサイト</a>をご参照ください。</p>
+
+  <h2>5. 第三者サービスについて</h2>
+  <p>本サービスは以下の第三者サービスを使用しています。</p>
+  <ul>
+    <li><strong>Google Firebase / Firestore</strong>（認証・データ保存）</li>
+    <li><strong>Anthropic Claude API</strong>（AI生成）</li>
+    <li><strong>Google Fonts</strong>（フォント表示）</li>
+  </ul>
+  <p>これらのサービスのプライバシーポリシーは、各社のウェブサイトをご参照ください。</p>
+
+  <h2>6. データの削除</h2>
+  <p>ユーザーは、アプリ内の操作によりいつでも自分のアイデアデータを削除することができます。アカウントごとのデータ削除については、下記のお問い合わせ先までご連絡ください。</p>
+
+  <h2>7. Cookieおよびローカルストレージ</h2>
+  <p>本サービスでは、Firebaseの認証状態を維持するためにブラウザのローカルストレージを使用します。これはログイン状態の保持のみに使用され、第三者への情報提供には使用しません。</p>
+
+  <h2>8. お子様の利用について</h2>
+  <p>本サービスは13歳未満のお子様を対象としていません。13歳未満の方のご利用はお断りしております。</p>
+
+  <h2>9. プライバシーポリシーの変更</h2>
+  <p>本ポリシーは、法令の改正やサービス内容の変更に伴い、予告なく更新されることがあります。変更後のポリシーは、本ページに掲載した時点で効力を生じるものとします。</p>
+
+  <h2>お問い合わせ</h2>
+  <div class="contact">
+    個人情報の取り扱いに関するご質問・ご要望は、下記までご連絡ください。<br><br>
+    メール：<a href="mailto:info@kireit.jp">info@kireit.jp</a>
+  </div>
+</div>
+</body>
+</html>

@@ -54,6 +54,8 @@ body { background: var(--bg); font-family: 'Noto Serif JP','Hiragino Mincho ProN
 .google-btn:active { opacity:0.8; }
 .google-icon { width:20px; height:20px; }
 .loading-note { font-size:11px; color:var(--ink-faint); font-family:'Noto Sans JP',sans-serif; margin-top:1rem; }
+.legal-links { font-size:11px; color:var(--ink-faint); font-family:'Noto Sans JP',sans-serif; margin-top:0.6rem; }
+.legal-links a { color:var(--ink-soft); text-decoration:underline; }
 
 /* ── App ── */
 #app { display:none; min-height:100dvh; flex-direction:column; }
@@ -159,6 +161,13 @@ body { background: var(--bg); font-family: 'Noto Serif JP','Hiragino Mincho ProN
       Googleでログイン
     </button>
     <p class="loading-note">ログインするとすべての端末でデータが同期されます</p>
+    <p class="loading-note" style="margin-top:0.5rem;">
+      ログインすることで
+      <a href="terms.html" style="color:var(--accent);text-decoration:none;">利用規約</a>
+      および
+      <a href="privacy.html" style="color:var(--accent);text-decoration:none;">プライバシーポリシー</a>
+      に同意したものとみなします
+    </p>
   </div>
 </div>
 
