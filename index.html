@@ -162,6 +162,101 @@ body { background: var(--bg); font-family: 'Noto Serif JP','Hiragino Mincho ProN
 @keyframes blink { 0%,100%{opacity:0.2} 50%{opacity:1} }
 
 @media (max-width:400px) { .card-date { display:none; } .app-title { font-size:16px; } .ai-badge { display:none; } }
+
+/* ── Gemini壁打ちチャット ── */
+.gemini-btn {
+  display:inline-flex; align-items:center; gap:6px;
+  margin-top:12px; padding:8px 14px;
+  background:#EEF2FF; border:1px solid #C7D2FE;
+  border-radius:9px; color:#3D4FA0; font-size:12px;
+  font-family:'Noto Sans JP',sans-serif; cursor:pointer;
+  -webkit-tap-highlight-color:transparent; transition:all 0.15s;
+}
+.gemini-btn:hover { background:#E0E7FF; }
+.gemini-btn:active { opacity:0.8; }
+
+.chat-panel {
+  margin-top:12px; border:1px solid var(--indigo-border);
+  border-radius:12px; background:#FAFBFF; overflow:hidden;
+}
+.chat-header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 14px; background:#EEF2FF;
+  border-bottom:1px solid var(--indigo-border);
+  font-size:12px; font-family:'Noto Sans JP',sans-serif; color:var(--indigo);
+  font-weight:500;
+}
+.chat-close-btn {
+  background:none; border:none; color:var(--ink-soft);
+  font-size:16px; cursor:pointer; padding:0 4px; line-height:1;
+}
+.chat-messages {
+  padding:12px 14px; display:flex; flex-direction:column; gap:10px;
+  max-height:320px; overflow-y:auto;
+}
+.chat-bubble {
+  max-width:88%; padding:9px 12px; border-radius:10px;
+  font-size:13px; line-height:1.75; font-family:'Noto Sans JP',sans-serif;
+}
+.chat-bubble.ai {
+  background:#EEF2FF; color:#252D5C; border-bottom-left-radius:3px;
+  align-self:flex-start;
+}
+.chat-bubble.user {
+  background:var(--indigo); color:#fff; border-bottom-right-radius:3px;
+  align-self:flex-end;
+}
+.chat-bubble.thinking {
+  background:#EEF2FF; color:var(--ink-soft); font-style:italic;
+  align-self:flex-start;
+}
+.chat-input-row {
+  display:flex; gap:8px; padding:10px 12px;
+  border-top:1px solid var(--indigo-border); background:#fff;
+}
+.chat-input {
+  flex:1; border:1px solid var(--indigo-border); border-radius:8px;
+  padding:8px 10px; font-size:14px; font-family:'Noto Sans JP',sans-serif;
+  color:var(--ink); outline:none; resize:none;
+  min-height:40px; max-height:100px; overflow-y:auto;
+  -webkit-appearance:none;
+}
+.chat-input:focus { border-color:var(--indigo); }
+.chat-send-btn {
+  padding:8px 14px; background:var(--indigo); color:#fff;
+  border:none; border-radius:8px; font-size:13px;
+  font-family:'Noto Sans JP',sans-serif; cursor:pointer;
+  -webkit-tap-highlight-color:transparent; white-space:nowrap;
+  align-self:flex-end; min-height:40px;
+}
+.chat-send-btn:disabled { opacity:0.4; cursor:default; }
+.chat-save-row {
+  padding:10px 12px; border-top:1px solid var(--indigo-border);
+  background:#F5F7FF; display:flex; justify-content:center;
+}
+.chat-save-btn {
+  padding:9px 20px; background:#fff; border:1px solid var(--indigo);
+  border-radius:9px; color:var(--indigo); font-size:12px;
+  font-family:'Noto Sans JP',sans-serif; font-weight:500;
+  cursor:pointer; -webkit-tap-highlight-color:transparent;
+  transition:all 0.15s;
+}
+.chat-save-btn:hover { background:var(--indigo); color:#fff; }
+.chat-save-btn:disabled { opacity:0.4; cursor:default; }
+
+.gemini-summary-box {
+  margin-top:12px; background:#F0FDF9; border:1px solid #99E6D0;
+  border-radius:10px; padding:12px 14px;
+  font-size:12px; font-family:'Noto Sans JP',sans-serif; color:#1D4D47;
+  line-height:1.8;
+}
+.gemini-summary-box .summary-label {
+  font-size:10px; color:#2A7B6F; font-weight:600; margin-bottom:6px;
+  display:block; letter-spacing:0.05em;
+}
+.gemini-summary-item { margin-bottom:8px; }
+.gemini-summary-item:last-child { margin-bottom:0; }
+.gemini-summary-item strong { color:#1A5C52; }
 </style>
 </head>
 <body>
@@ -556,9 +651,158 @@ function renderAll() {
       <p class="detail-text">${escHtml(idea.detail)}</p>
       <ul class="points-list">${idea.points.map(p=>`<li class="point-item"><span class="point-arrow">▸</span><span>${escHtml(p)}</span></li>`).join('')}</ul>
       <p class="raw-note">メモ原文: ${escHtml(idea.raw)}</p>
+      ${idea.geminiFeedback ? `
+      <div class="gemini-summary-box">
+        <span class="summary-label">✦ Gemini壁打ちサマリー</span>
+        <div class="gemini-summary-item"><strong>フォーカスポイント：</strong>${escHtml(idea.geminiFeedback.focusPoint)}</div>
+        <div class="gemini-summary-item"><strong>深掘りされた具体策：</strong>${escHtml(idea.geminiFeedback.concreteIdea)}</div>
+        <div class="gemini-summary-item"><strong>次のステップ：</strong>${escHtml(idea.geminiFeedback.nextStep)}</div>
+      </div>` : ''}
+      <button class="gemini-btn" onclick="event.stopPropagation();openGeminiChat(${idea.id})">✦ Geminiで壁打ちする</button>
+      <div id="chatPanel_${idea.id}" style="display:none">
+        <div class="chat-panel">
+          <div class="chat-header">
+            <span>✦ Geminiと壁打ち中</span>
+            <button class="chat-close-btn" onclick="event.stopPropagation();closeGeminiChat(${idea.id})">✕</button>
+          </div>
+          <div class="chat-messages" id="chatMessages_${idea.id}"></div>
+          <div class="chat-input-row">
+            <textarea class="chat-input" id="chatInput_${idea.id}" placeholder="返答を入力…" rows="1"
+              onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat(${idea.id})}"></textarea>
+            <button class="chat-send-btn" id="chatSendBtn_${idea.id}" onclick="event.stopPropagation();sendChat(${idea.id})">送信</button>
+          </div>
+          <div class="chat-save-row">
+            <button class="chat-save-btn" id="chatSaveBtn_${idea.id}" onclick="event.stopPropagation();saveGeminiSummary(${idea.id})" disabled>壁打ち内容を整理して保存</button>
+          </div>
+        </div>
+      </div>
     </div>`;
     card.innerHTML = html; list.appendChild(card);
   });
+}
+
+// ── Gemini壁打ちチャット ─────────────────────────────
+const GEMINI_FN_URL = 'https://gemini-chat-682338340449.asia-northeast1.run.app';
+const chatHistories = {}; // ideaId -> [{role, text}]
+
+window.openGeminiChat = async (id) => {
+  const panel = document.getElementById('chatPanel_' + id);
+  if (!panel) return;
+  panel.style.display = 'block';
+  // 初回のみAIから先制メッセージを送る
+  if (!chatHistories[id] || chatHistories[id].length === 0) {
+    chatHistories[id] = [];
+    const idea = ideas.find(i => i.id === id);
+    if (!idea) return;
+    appendChatBubble(id, 'thinking', '考え中…');
+    try {
+      const idToken = await currentUser.getIdToken();
+      const res = await fetch(GEMINI_FN_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
+        body: JSON.stringify({ mode: 'chat', ideaDetail: idea.detail, history: [] })
+      });
+      const data = await res.json();
+      removeThinkingBubble(id);
+      if (data.error) { appendChatBubble(id, 'ai', 'エラーが発生しました。'); return; }
+      chatHistories[id].push({ role: 'model', text: data.reply });
+      appendChatBubble(id, 'ai', data.reply);
+      document.getElementById('chatSaveBtn_' + id).disabled = false;
+    } catch(e) {
+      removeThinkingBubble(id);
+      appendChatBubble(id, 'ai', 'エラーが発生しました。');
+    }
+  }
+};
+
+window.closeGeminiChat = (id) => {
+  const panel = document.getElementById('chatPanel_' + id);
+  if (panel) panel.style.display = 'none';
+};
+
+window.sendChat = async (id) => {
+  const inputEl = document.getElementById('chatInput_' + id);
+  const sendBtn = document.getElementById('chatSendBtn_' + id);
+  const text = inputEl.value.trim();
+  if (!text) return;
+  inputEl.value = ''; inputEl.style.height = 'auto';
+  const idea = ideas.find(i => i.id === id);
+  if (!idea) return;
+
+  chatHistories[id] = chatHistories[id] || [];
+  chatHistories[id].push({ role: 'user', text });
+  appendChatBubble(id, 'user', text);
+  sendBtn.disabled = true;
+  appendChatBubble(id, 'thinking', '考え中…');
+
+  try {
+    const idToken = await currentUser.getIdToken();
+    const res = await fetch(GEMINI_FN_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
+      body: JSON.stringify({ mode: 'chat', ideaDetail: idea.detail, history: chatHistories[id] })
+    });
+    const data = await res.json();
+    removeThinkingBubble(id);
+    if (data.error) { appendChatBubble(id, 'ai', 'エラーが発生しました。'); return; }
+    chatHistories[id].push({ role: 'model', text: data.reply });
+    appendChatBubble(id, 'ai', data.reply);
+    document.getElementById('chatSaveBtn_' + id).disabled = false;
+  } catch(e) {
+    removeThinkingBubble(id);
+    appendChatBubble(id, 'ai', 'エラーが発生しました。');
+  } finally {
+    sendBtn.disabled = false;
+  }
+};
+
+window.saveGeminiSummary = async (id) => {
+  const saveBtn = document.getElementById('chatSaveBtn_' + id);
+  const idea = ideas.find(i => i.id === id);
+  if (!idea || !chatHistories[id] || chatHistories[id].length === 0) return;
+  saveBtn.disabled = true;
+  saveBtn.textContent = '整理中…';
+
+  try {
+    const idToken = await currentUser.getIdToken();
+    const res = await fetch(GEMINI_FN_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
+      body: JSON.stringify({ mode: 'summarize', ideaDetail: idea.detail, history: chatHistories[id] })
+    });
+    const data = await res.json();
+    if (data.error || !data.summary) {
+      saveBtn.textContent = 'エラーが発生しました';
+      setTimeout(() => { saveBtn.textContent = '壁打ち内容を整理して保存'; saveBtn.disabled = false; }, 2000);
+      return;
+    }
+    // Firestoreに保存
+    const updatedIdea = { ...idea, geminiFeedback: { ...data.summary, savedAt: new Date().toLocaleDateString('ja-JP') } };
+    await saveIdeaToDb(updatedIdea);
+    saveBtn.textContent = '✓ 保存しました！';
+    setTimeout(() => { closeGeminiChat(id); }, 1200);
+  } catch(e) {
+    saveBtn.textContent = 'エラーが発生しました';
+    setTimeout(() => { saveBtn.textContent = '壁打ち内容を整理して保存'; saveBtn.disabled = false; }, 2000);
+  }
+};
+
+function appendChatBubble(id, role, text) {
+  const container = document.getElementById('chatMessages_' + id);
+  if (!container) return;
+  const div = document.createElement('div');
+  div.className = 'chat-bubble ' + role;
+  if (role === 'thinking') div.dataset.thinking = 'true';
+  div.textContent = text;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function removeThinkingBubble(id) {
+  const container = document.getElementById('chatMessages_' + id);
+  if (!container) return;
+  const thinking = container.querySelector('[data-thinking="true"]');
+  if (thinking) thinking.remove();
 }
 
 // ── Service Worker ────────────────────────────────────
