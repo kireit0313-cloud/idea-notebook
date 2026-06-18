@@ -163,6 +163,78 @@ body { background: var(--bg); font-family: 'Noto Serif JP','Hiragino Mincho ProN
 
 @media (max-width:400px) { .card-date { display:none; } .app-title { font-size:16px; } .ai-badge { display:none; } }
 
+/* ── 入力モーダル ── */
+.input-modal-overlay {
+  display:none; position:fixed; inset:0; z-index:300;
+  background:rgba(0,0,0,0.45); align-items:flex-end;
+  justify-content:center;
+}
+.input-modal-overlay.open { display:flex; }
+.input-modal {
+  background:var(--surface); border-radius:20px 20px 0 0;
+  width:100%; max-width:var(--max-w);
+  padding:16px 16px calc(16px + var(--safe-bottom));
+  box-shadow:0 -8px 32px rgba(0,0,0,0.15);
+  display:flex; flex-direction:column; gap:12px;
+  max-height:85dvh;
+}
+.input-modal-header {
+  display:flex; align-items:center; justify-content:space-between;
+  font-size:13px; font-family:'Noto Sans JP',sans-serif;
+  color:var(--ink-soft); font-weight:500;
+}
+.modal-close-btn {
+  background:none; border:none; color:var(--ink-soft);
+  font-size:20px; cursor:pointer; padding:4px 6px; line-height:1;
+  -webkit-tap-highlight-color:transparent;
+}
+.modal-textarea {
+  flex:1; border:1px solid var(--border); border-radius:12px;
+  padding:12px 14px; font-size:16px; color:var(--ink);
+  background:var(--bg); font-family:'Noto Serif JP',Georgia,serif;
+  line-height:1.7; resize:none; outline:none;
+  min-height:160px; max-height:45dvh; overflow-y:auto;
+  -webkit-appearance:none;
+}
+.modal-textarea:focus { border-color:var(--accent); }
+.modal-wave-wrap {
+  display:none; align-items:center; gap:6px;
+  font-size:12px; color:var(--mic); font-family:'Noto Sans JP',sans-serif;
+}
+.modal-wave-wrap.active { display:flex; }
+.modal-footer {
+  display:flex; align-items:center; gap:8px;
+}
+.modal-mic-btn {
+  display:flex; align-items:center; gap:6px;
+  padding:10px 14px; border:1px solid var(--border);
+  border-radius:10px; background:transparent; color:var(--ink-mid);
+  cursor:pointer; font-size:13px; font-family:'Noto Sans JP',sans-serif;
+  -webkit-tap-highlight-color:transparent; min-height:44px; transition:all 0.15s;
+}
+.modal-mic-btn.active { border-color:var(--mic); background:#D9404018; color:var(--mic); }
+.modal-clear-btn {
+  padding:10px 10px; border:1px solid var(--border-light);
+  border-radius:10px; background:transparent; color:var(--ink-faint);
+  cursor:pointer; font-size:16px;
+  -webkit-tap-highlight-color:transparent; min-height:44px;
+}
+.modal-add-btn {
+  flex:1; padding:10px 20px; background:var(--accent); color:#fff;
+  border:none; border-radius:10px; font-size:14px;
+  font-family:'Noto Sans JP',sans-serif; font-weight:500;
+  cursor:pointer; -webkit-tap-highlight-color:transparent;
+  min-height:44px; transition:opacity 0.15s;
+}
+.modal-add-btn:disabled { opacity:0.4; cursor:default; }
+.input-preview {
+  flex:1; font-size:15px; color:var(--ink-faint);
+  font-family:'Noto Serif JP',Georgia,serif; line-height:1.6;
+  cursor:pointer; min-height:28px; padding:2px 0;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  border:none; background:transparent; outline:none; width:100%; text-align:left;
+}
+
 /* ── Gemini壁打ちチャット ── */
 .gemini-btn {
   display:inline-flex; align-items:center; gap:6px;
@@ -333,16 +405,38 @@ body { background: var(--bg); font-family: 'Noto Serif JP','Hiragino Mincho ProN
   </div>
 
   <div class="content">
-    <div class="input-box">
-      <div class="input-top" id="inputTop">
-        <textarea class="main-input" id="mainInput" placeholder="アイデアのタネをメモ…" autocomplete="off" enterkeyhint="send" rows="1"></textarea>
+    <!-- 入力プレビュー（タップでモーダルを開く） -->
+    <div class="input-box" onclick="openInputModal()" style="cursor:pointer">
+      <div class="input-top">
+        <button class="input-preview" id="inputPreview">アイデアのタネをメモ…</button>
       </div>
-      <div class="input-bottom">
-        <button class="mic-btn" id="micBtn" onclick="toggleMic()" style="display:none">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="9" y1="22" x2="15" y2="22"/></svg>
-          <span id="micLabel">音声</span>
-        </button>
-        <button class="add-btn" id="addBtn" onclick="handleAdd()" disabled>追加 →</button>
+      <div class="input-bottom" style="pointer-events:none;">
+        <span style="font-size:12px;font-family:'Noto Sans JP',sans-serif;color:var(--ink-soft);">🎤 音声入力対応</span>
+        <span style="flex:1"></span>
+        <span style="font-size:12px;font-family:'Noto Sans JP',sans-serif;color:var(--ink-faint);">タップして入力 →</span>
+      </div>
+    </div>
+
+    <!-- 入力モーダル -->
+    <div class="input-modal-overlay" id="inputModalOverlay" onclick="handleOverlayClick(event)">
+      <div class="input-modal">
+        <div class="input-modal-header">
+          <span>アイデアのタネをメモ</span>
+          <button class="modal-close-btn" onclick="closeInputModal()">×</button>
+        </div>
+        <textarea class="modal-textarea" id="modalInput" placeholder="ここにアイデアを入力…&#10;音声入力で話した内容も追記できます。" autocomplete="off"></textarea>
+        <div class="modal-wave-wrap" id="modalWaveWrap">
+          <div class="wave-wrap" id="modalWaveAnim"></div>
+          <span>聞いています… もう一度タップで停止</span>
+        </div>
+        <div class="modal-footer">
+          <button class="modal-mic-btn" id="modalMicBtn" onclick="toggleModalMic()" style="display:none">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="9" y1="22" x2="15" y2="22"/></svg>
+            <span id="modalMicLabel">音声入力</span>
+          </button>
+          <button class="modal-clear-btn" onclick="clearModalInput()" title="クリア">🗑</button>
+          <button class="modal-add-btn" id="modalAddBtn" onclick="handleModalAdd()" disabled>追加 →</button>
+        </div>
       </div>
     </div>
     <div id="errorMsg" class="error-msg"></div>
@@ -440,23 +534,19 @@ onAuthStateChanged(auth, user => {
     }
     // Mic
     if (window.SpeechRecognition || window.webkitSpeechRecognition) {
-      document.getElementById('micBtn').style.display = 'flex';
+      document.getElementById('modalMicBtn').style.display = 'flex';
     }
     // Subscribe to Firestore
     subscribeIdeas(user.uid);
-    // Input listener
-    const inp = document.getElementById('mainInput');
-    inp.addEventListener('input', () => {
-      document.getElementById('addBtn').disabled = !inp.value.trim() || generating;
-      // Auto-resize
-      inp.style.height = 'auto';
-      inp.style.height = Math.min(inp.scrollHeight, 160) + 'px';
+    // Input listener (モーダル)
+    const modalInp = document.getElementById('modalInput');
+    modalInp.addEventListener('input', () => {
+      updateInputPreview(modalInp.value);
     });
-    inp.addEventListener('keydown', e => {
-      // Shift+Enter: 改行、Enter単体: 追加
+    modalInp.addEventListener('keydown', e => {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
-        handleAdd();
+        handleModalAdd();
       }
     });
   } else {
@@ -508,32 +598,7 @@ async function generateIdeaContent(raw) {
   return data;
 }
 
-window.handleAdd = async () => {
-  const inp = document.getElementById('mainInput');
-  const raw = inp.value.trim();
-  if (!raw || generating) return;
-  inp.value = ''; inp.style.height = 'auto'; inp.dispatchEvent(new Event('input')); inp.blur();
-  generating = true;
-  setError(null);
-  document.getElementById('generatingBar').style.display = 'flex';
-  document.getElementById('addBtn').disabled = true;
-  try {
-    const content = await generateIdeaContent(raw);
-    const idea = { id: Date.now(), raw, ...content, createdAt: new Date().toLocaleDateString('ja-JP') };
-    await saveIdeaToDb(idea);
-    openId = idea.id; openDetail = null;
-  } catch(e) {
-    console.error(e);
-    if (e.status === 429) {
-      setError(e.message);
-    } else {
-      setError('エラー: ' + (e.message || '生成に失敗しました'));
-    }
-  } finally {
-    generating = false;
-    document.getElementById('generatingBar').style.display = 'none';
-  }
-};
+
 
 // ── Card Actions ──────────────────────────────────────
 window.deleteIdea = async (id) => {
@@ -554,38 +619,136 @@ function setError(msg) {
   }
 }
 
-// ── Mic ───────────────────────────────────────────────
-window.toggleMic = () => {
+// ── 入力モーダル ────────────────────────────────────
+window.openInputModal = () => {
+  document.getElementById('inputModalOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('modalInput').focus(), 100);
+};
+window.closeInputModal = () => {
+  if (modalListening) stopModalMic();
+  document.getElementById('inputModalOverlay').classList.remove('open');
+};
+window.handleOverlayClick = (e) => {
+  if (e.target === document.getElementById('inputModalOverlay')) closeInputModal();
+};
+window.clearModalInput = () => {
+  document.getElementById('modalInput').value = '';
+  document.getElementById('modalAddBtn').disabled = true;
+  updateInputPreview('');
+};
+window.handleModalAdd = async () => {
+  const val = document.getElementById('modalInput').value.trim();
+  if (!val || generating) return;
+  closeInputModal();
+  // 既存のhandleAddと同じ処理をする
+  if (modalListening) stopModalMic();
+  document.getElementById('modalInput').value = '';
+  updateInputPreview('');
+  generating = true;
+  setError(null);
+  document.getElementById('generatingBar').style.display = 'flex';
+  try {
+    const content = await generateIdeaContent(val);
+    const idea = { id: Date.now(), raw: val, ...content, createdAt: new Date().toLocaleDateString('ja-JP') };
+    await saveIdeaToDb(idea);
+    openId = idea.id; openDetail = null;
+  } catch(e) {
+    console.error(e);
+    if (e.status === 429) {
+      setError('本日のAI生成回数の上限（10回）に達しました。明日またお試しください。');
+    } else {
+      setError('エラー: ' + (e.message || '生成に失敗しました'));
+    }
+  } finally {
+    generating = false;
+    document.getElementById('generatingBar').style.display = 'none';
+  }
+};
+function updateInputPreview(val) {
+  const el = document.getElementById('inputPreview');
+  if (val.trim()) {
+    el.textContent = val;
+    el.style.color = 'var(--ink)';
+  } else {
+    el.textContent = 'アイデアのタネをメモ…';
+    el.style.color = 'var(--ink-faint)';
+  }
+  document.getElementById('modalAddBtn').disabled = !val.trim() || generating;
+}
+
+// ── モーダル音声入力 ──────────────────────────────────
+let modalListening = false, modalRecognition = null, modalAccumulated = '';
+
+window.toggleModalMic = () => {
+  if (modalListening) { stopModalMic(); return; }
+  startModalMic();
+};
+
+function startModalMic() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) return;
-  if (listening) { recognition && recognition.stop(); setListeningUI(false); return; }
-  recognition = new SR();
-  recognition.lang = 'ja-JP'; recognition.continuous = false; recognition.interimResults = true;
-  recognition.onresult = e => {
-    const t = Array.from(e.results).map(r => r[0].transcript).join('');
-    document.getElementById('mainInput').value = t;
-    document.getElementById('mainInput').dispatchEvent(new Event('input'));
+  modalAccumulated = document.getElementById('modalInput').value;
+  modalRecognition = new SR();
+  modalRecognition.lang = 'ja-JP';
+  modalRecognition.continuous = true;
+  modalRecognition.interimResults = true;
+  modalRecognition.onresult = e => {
+    let interim = '';
+    let final = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) final += e.results[i][0].transcript;
+      else interim += e.results[i][0].transcript;
+    }
+    if (final) modalAccumulated += final;
+    const el = document.getElementById('modalInput');
+    el.value = modalAccumulated + interim;
+    updateInputPreview(el.value);
   };
-  recognition.onend = () => setListeningUI(false);
-  recognition.onerror = () => { setListeningUI(false); setError('マイクへのアクセスに失敗しました。'); };
-  recognition.start(); setListeningUI(true);
-};
-function setListeningUI(val) {
-  listening = val;
-  const btn = document.getElementById('micBtn'), top = document.getElementById('inputTop');
-  const inp = document.getElementById('mainInput');
+  modalRecognition.onend = () => {
+    // continuousモードでも途切れた場合は自動再起動
+    if (modalListening) {
+      try { modalRecognition.start(); } catch(e) {}
+    }
+  };
+  modalRecognition.onerror = (e) => {
+    if (e.error === 'no-speech') return; // 無音は無視して継続
+    stopModalMic();
+    setError('マイクへのアクセスに失敗しました。');
+  };
+  modalRecognition.start();
+  modalListening = true;
+  setModalMicUI(true);
+}
+
+function stopModalMic() {
+  modalListening = false;
+  if (modalRecognition) { try { modalRecognition.stop(); } catch(e) {} modalRecognition = null; }
+  // 最終テキストを確定
+  const el = document.getElementById('modalInput');
+  el.value = modalAccumulated + (el.value.replace(modalAccumulated, '') || '');
+  modalAccumulated = el.value;
+  updateInputPreview(el.value);
+  setModalMicUI(false);
+}
+
+function setModalMicUI(val) {
+  const btn = document.getElementById('modalMicBtn');
+  const waveWrap = document.getElementById('modalWaveWrap');
+  const waveAnim = document.getElementById('modalWaveAnim');
   if (val) {
-    btn.classList.add('active'); document.getElementById('micLabel').textContent = '停止';
-    inp.placeholder = '聞いています…';
-    if (!document.getElementById('waveAnim')) {
-      const w = document.createElement('div'); w.id='waveAnim'; w.className='wave-wrap';
-      for (let i=0;i<5;i++) { const b=document.createElement('div'); b.className='wave-bar'; b.style.animationDelay=(i*0.1)+'s'; w.appendChild(b); }
-      top.insertBefore(w, top.firstChild);
+    btn.classList.add('active');
+    document.getElementById('modalMicLabel').textContent = '停止';
+    waveWrap.classList.add('active');
+    waveAnim.innerHTML = '';
+    for (let i=0;i<5;i++) {
+      const b=document.createElement('div'); b.className='wave-bar';
+      b.style.animationDelay=(i*0.1)+'s'; waveAnim.appendChild(b);
     }
   } else {
-    btn.classList.remove('active'); document.getElementById('micLabel').textContent = '音声';
-    inp.placeholder = 'アイデアのタネをメモ…';
-    const w = document.getElementById('waveAnim'); if (w) w.remove();
+    btn.classList.remove('active');
+    document.getElementById('modalMicLabel').textContent = '音声入力';
+    waveWrap.classList.remove('active');
+    waveAnim.innerHTML = '';
   }
 }
 
