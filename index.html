@@ -194,7 +194,8 @@ body { background: var(--bg); font-family: 'Noto Serif JP','Hiragino Mincho ProN
   background:var(--bg); font-family:'Noto Serif JP',Georgia,serif;
   line-height:1.7; resize:none; outline:none;
   min-height:160px; max-height:45dvh; overflow-y:auto;
-  -webkit-appearance:none;
+  overflow-x:hidden; word-break:break-all; white-space:pre-wrap;
+  width:100%; box-sizing:border-box; -webkit-appearance:none;
 }
 .modal-textarea:focus { border-color:var(--accent); }
 .modal-wave-wrap {
@@ -705,10 +706,8 @@ function startModalMic() {
     updateInputPreview(el.value);
   };
   modalRecognition.onend = () => {
-    // continuousモードでも途切れた場合は自動再起動
-    if (modalListening) {
-      try { modalRecognition.start(); } catch(e) {}
-    }
+    // continuous:true のため自動再起動不要（再起動するとループの原因になる）
+    if (modalListening) stopModalMic();
   };
   modalRecognition.onerror = (e) => {
     if (e.error === 'no-speech') return; // 無音は無視して継続
