@@ -30,8 +30,8 @@
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --max-w: 640px;
 }
-html { height: 100%; }
-body { background: var(--bg); font-family: 'Noto Serif JP','Hiragino Mincho ProN',Georgia,serif; min-height:100dvh; -webkit-text-size-adjust:100%; }
+html { height: 100%; overflow-x:hidden; }
+body { background: var(--bg); font-family: 'Noto Serif JP','Hiragino Mincho ProN',Georgia,serif; min-height:100dvh; -webkit-text-size-adjust:100%; overflow-x:hidden; max-width:100vw; }
 
 /* ── Loading / Login Screen ── */
 #loadingScreen {
@@ -167,16 +167,16 @@ body { background: var(--bg); font-family: 'Noto Serif JP','Hiragino Mincho ProN
 .input-modal-overlay {
   display:none; position:fixed; inset:0; z-index:300;
   background:rgba(0,0,0,0.45); align-items:flex-end;
-  justify-content:center;
+  justify-content:center; overflow:hidden;
 }
 .input-modal-overlay.open { display:flex; }
 .input-modal {
   background:var(--surface); border-radius:20px 20px 0 0;
-  width:100%; max-width:var(--max-w);
+  width:100%; max-width:min(var(--max-w), 100vw);
   padding:16px 16px calc(16px + var(--safe-bottom));
   box-shadow:0 -8px 32px rgba(0,0,0,0.15);
   display:flex; flex-direction:column; gap:12px;
-  max-height:85dvh;
+  max-height:85dvh; overflow:hidden; box-sizing:border-box;
 }
 .input-modal-header {
   display:flex; align-items:center; justify-content:space-between;
