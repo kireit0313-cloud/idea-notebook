@@ -688,44 +688,70 @@ window.toggleModalMic = () => {
 function startModalMic() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) return;
+  // スマホ対応：continuous:false + onend で手動再起動する方式
+  // continuous:true はスマホブラウザで強制終了・重複のバグが起きるため使わない
   modalAccumulated = document.getElementById('modalInput').value;
-  modalRecognition = new SR();
-  modalRecognition.lang = 'ja-JP';
-  modalRecognition.continuous = true;
-  modalRecognition.interimResults = true;
-  modalRecognition.onresult = e => {
-    let interim = '';
-    let final = '';
-    for (let i = e.resultIndex; i < e.results.length; i++) {
-      if (e.results[i].isFinal) final += e.results[i][0].transcript;
-      else interim += e.results[i][0].transcript;
-    }
-    if (final) modalAccumulated += final;
-    const el = document.getElementById('modalInput');
-    el.value = modalAccumulated + interim;
-    updateInputPreview(el.value);
-  };
-  modalRecognition.onend = () => {
-    // continuous:true のため自動再起動不要（再起動するとループの原因になる）
-    if (modalListening) stopModalMic();
-  };
-  modalRecognition.onerror = (e) => {
-    if (e.error === 'no-speech') return; // 無音は無視して継続
-    stopModalMic();
-    setError('マイクへのアクセスに失敗しました。');
-  };
-  modalRecognition.start();
+
+  function createAndStart() {
+    if (!modalListening) return;
+    const r = new SR();
+    r.lang = 'ja-JP';
+    r.continuous = false;       // スマホ対応のためfalse
+    r.interimResults = true;
+    let lastInterim = '';
+
+    r.onresult = e => {
+      let interim = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        if (e.results[i].isFinal) {
+          modalAccumulated += e.results[i][0].transcript;
+          lastInterim = '';
+        } else {
+          interim += e.results[i][0].transcript;
+          lastInterim = interim;
+        }
+      }
+      const el = document.getElementById('modalInput');
+      el.value = modalAccumulated + lastInterim;
+      updateInputPreview(el.value);
+    };
+
+    r.onend = () => {
+      // ユーザーが停止していなければ次のセッションを開始（追記モード）
+      if (modalListening) {
+        setTimeout(createAndStart, 100); // 少し待ってから再起動
+      }
+    };
+
+    r.onerror = e => {
+      if (e.error === 'no-speech') {
+        // 無音の場合も再起動して待機継続
+        if (modalListening) setTimeout(createAndStart, 100);
+        return;
+      }
+      if (e.error === 'aborted') return; // 手動停止は無視
+      stopModalMic();
+      setError('マイクへのアクセスに失敗しました。');
+    };
+
+    modalRecognition = r;
+    try { r.start(); } catch(e) {}
+  }
+
   modalListening = true;
   setModalMicUI(true);
+  createAndStart();
 }
 
 function stopModalMic() {
   modalListening = false;
-  if (modalRecognition) { try { modalRecognition.stop(); } catch(e) {} modalRecognition = null; }
-  // 最終テキストを確定
+  if (modalRecognition) {
+    try { modalRecognition.stop(); } catch(e) {}
+    modalRecognition = null;
+  }
+  // interimテキストを確定させる
   const el = document.getElementById('modalInput');
-  el.value = modalAccumulated + (el.value.replace(modalAccumulated, '') || '');
-  modalAccumulated = el.value;
+  el.value = modalAccumulated;
   updateInputPreview(el.value);
   setModalMicUI(false);
 }
