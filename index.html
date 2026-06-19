@@ -158,6 +158,39 @@ body { background: var(--bg); font-family: 'Noto Serif JP','Hiragino Mincho ProN
 
 @media (max-width:400px) { .card-date { display:none; } .app-title { font-size:16px; } .ai-badge { display:none; } }
 
+/* ── 確認ダイアログ ── */
+.confirm-overlay {
+  display:none; position:fixed; inset:0; z-index:500;
+  background:rgba(0,0,0,0.5); align-items:center; justify-content:center;
+}
+.confirm-overlay.open { display:flex; }
+.confirm-box {
+  background:var(--surface); border-radius:16px;
+  padding:24px 20px 20px; width:min(320px, 88vw);
+  box-shadow:0 8px 32px rgba(0,0,0,0.2);
+  font-family:'Noto Sans JP',sans-serif; text-align:center;
+}
+.confirm-title {
+  font-size:15px; font-weight:600; color:var(--ink);
+  margin-bottom:8px;
+}
+.confirm-msg {
+  font-size:13px; color:var(--ink-soft); margin-bottom:20px; line-height:1.6;
+}
+.confirm-btns { display:flex; gap:10px; justify-content:center; }
+.confirm-cancel {
+  flex:1; padding:10px; border:1px solid var(--border);
+  border-radius:10px; background:transparent; color:var(--ink-mid);
+  font-size:14px; font-family:'Noto Sans JP',sans-serif; cursor:pointer;
+}
+.confirm-ok {
+  flex:1; padding:10px; border:none; border-radius:10px;
+  background:var(--danger); color:#fff;
+  font-size:14px; font-family:'Noto Sans JP',sans-serif;
+  cursor:pointer; font-weight:500;
+}
+.confirm-ok.safe { background:var(--indigo); }
+
 /* ── 入力モーダル ── */
 .input-modal-overlay {
   display:none; position:fixed; inset:0; z-index:300;
@@ -317,8 +350,24 @@ body { background: var(--bg); font-family: 'Noto Serif JP','Hiragino Mincho ProN
 </head>
 <body>
 
+<!-- 確認ダイアログ -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <div class="confirm-title" id="confirmTitle"></div>
+    <div class="confirm-msg" id="confirmMsg"></div>
+    <div class="confirm-btns">
+      <button class="confirm-cancel" onclick="resolveConfirm(false)">キャンセル</button>
+      <button class="confirm-ok" id="confirmOkBtn" onclick="resolveConfirm(true)">削除する</button>
+    </div>
+  </div>
+</div>
+
 <!-- Loading / Login Screen -->
 <div id="loadingScreen">
+  <div id="loadingSpinner" style="display:none; flex-direction:column; align-items:center; gap:12px; position:absolute; inset:0; background:var(--bg); z-index:10; justify-content:center;">
+    <div style="width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+    <p style="font-size:13px;color:var(--ink-soft);font-family:'Noto Sans JP',sans-serif;">ロード中…</p>
+  </div>
   <div class="loading-box">
     <div class="loading-logo">🗒</div>
     <div class="loading-title">アイデア帳</div>
@@ -476,18 +525,43 @@ let ideas = [], openId = null, openDetail = null, generating = false;
 let currentUser = null;
 let unsubscribe = null;
 
+// ── カスタム確認ダイアログ ────────────────────────────
+let confirmResolve = null;
+function showConfirm(title, msg, okLabel = '削除する', isSafe = false) {
+  return new Promise(resolve => {
+    confirmResolve = resolve;
+    document.getElementById('confirmTitle').textContent = title;
+    document.getElementById('confirmMsg').textContent = msg;
+    const okBtn = document.getElementById('confirmOkBtn');
+    okBtn.textContent = okLabel;
+    okBtn.className = 'confirm-ok' + (isSafe ? ' safe' : '');
+    document.getElementById('confirmOverlay').classList.add('open');
+  });
+}
+window.resolveConfirm = (result) => {
+  document.getElementById('confirmOverlay').classList.remove('open');
+  if (confirmResolve) { confirmResolve(result); confirmResolve = null; }
+};
+
 // ── Auth ──────────────────────────────────────────────
 window.signInWithGoogle = async () => {
+  // ローディングスピナーを表示（URLが見えないように）
+  document.getElementById('loadingSpinner').style.display = 'flex';
   try {
+    provider.setCustomParameters({ prompt: 'select_account' });
     await signInWithPopup(auth, provider);
   } catch(e) {
     console.error(e);
-    alert('ログインに失敗しました。もう一度お試しください。');
+    document.getElementById('loadingSpinner').style.display = 'none';
+    if (e.code !== 'auth/popup-closed-by-user') {
+      alert('ログインに失敗しました。もう一度お試しください。');
+    }
   }
 };
 
 window.signOut = async () => {
-  if (!confirm('ログアウトしますか？')) return;
+  const ok = await showConfirm('ログアウト', 'ログアウトしますか？', 'ログアウト', true);
+  if (!ok) return;
   if (unsubscribe) unsubscribe();
   await fbSignOut(auth);
   ideas = []; openId = null; openDetail = null; currentUser = null;
@@ -573,7 +647,8 @@ async function generateIdeaContent(raw) {
 
 // ── Card Actions ──────────────────────────────────────
 window.deleteIdea = async (id) => {
-  if (!confirm('このアイデアを削除しますか？')) return;
+  const ok = await showConfirm('アイデアの削除', 'このアイデアを削除しますか？');
+  if (!ok) return;
   await deleteIdeaFromDb(id);
   if (openId === id) { openId = null; openDetail = null; }
 };
@@ -864,7 +939,23 @@ function removeThinkingBubble(id) {
 }
 
 // ── Service Worker ────────────────────────────────────
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').then(reg => {
+    // 新しいSWが見つかったら自動で適用
+    reg.addEventListener('updatefound', () => {
+      const newWorker = reg.installing;
+      newWorker.addEventListener('statechange', () => {
+        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+          newWorker.postMessage({ type: 'SKIP_WAITING' });
+        }
+      });
+    });
+  }).catch(() => {});
+  // SWが切り替わったらページをリロード
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    window.location.reload();
+  });
+}
 </script>
 </body>
 </html>
