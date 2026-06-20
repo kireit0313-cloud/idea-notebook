@@ -151,6 +151,84 @@ body { background: var(--bg); font-family: 'Noto Serif JP','Hiragino Mincho ProN
 .point-arrow { color:var(--indigo); font-weight:700; flex-shrink:0; }
 .raw-note { font-size:11px; color:var(--ink-faint); border-top:1px solid var(--indigo-border); padding-top:9px; font-family:'Noto Sans JP',sans-serif; }
 
+/* ── 編集モーダル ── */
+.edit-modal-overlay {
+  display:none; position:fixed; inset:0; z-index:400;
+  background:rgba(0,0,0,0.5); align-items:flex-end;
+  justify-content:center; overflow:hidden;
+}
+.edit-modal-overlay.open { display:flex; }
+.edit-modal {
+  background:var(--surface); border-radius:20px 20px 0 0;
+  width:100%; max-width:min(var(--max-w), 100vw);
+  padding:16px 16px calc(16px + var(--safe-bottom));
+  box-shadow:0 -8px 32px rgba(0,0,0,0.15);
+  display:flex; flex-direction:column; gap:12px;
+  max-height:90dvh; overflow-y:auto; box-sizing:border-box;
+}
+.edit-modal-header {
+  display:flex; align-items:center; justify-content:space-between;
+  font-size:13px; font-family:'Noto Sans JP',sans-serif;
+  color:var(--ink-soft); font-weight:500; flex-shrink:0;
+}
+.edit-field-label {
+  font-size:11px; color:var(--ink-faint); font-family:'Noto Sans JP',sans-serif;
+  margin-bottom:4px; display:block;
+}
+.edit-input {
+  width:100%; border:1px solid var(--border); border-radius:10px;
+  padding:10px 12px; font-size:15px; color:var(--ink);
+  background:var(--bg); font-family:'Noto Serif JP',Georgia,serif;
+  line-height:1.6; outline:none; box-sizing:border-box;
+  -webkit-appearance:none;
+}
+.edit-input:focus { border-color:var(--accent); }
+.edit-textarea {
+  width:100%; border:1px solid var(--border); border-radius:10px;
+  padding:10px 12px; font-size:13px; color:var(--ink);
+  background:var(--bg); font-family:'Noto Serif JP',Georgia,serif;
+  line-height:1.75; outline:none; resize:none; box-sizing:border-box;
+  -webkit-appearance:none; overflow-x:hidden; word-break:break-all;
+}
+.edit-textarea:focus { border-color:var(--accent); }
+.edit-point-input {
+  width:100%; border:1px solid var(--border); border-radius:10px;
+  padding:9px 12px; font-size:13px; color:var(--ink);
+  background:var(--bg); font-family:'Noto Sans JP',sans-serif;
+  line-height:1.6; outline:none; box-sizing:border-box;
+  -webkit-appearance:none;
+}
+.edit-point-input:focus { border-color:var(--accent); }
+.edit-points-wrap { display:flex; flex-direction:column; gap:6px; }
+.edit-footer {
+  display:flex; gap:8px; flex-shrink:0; padding-top:4px;
+}
+.edit-cancel-btn {
+  flex:1; padding:11px; border:1px solid var(--border);
+  border-radius:10px; background:transparent; color:var(--ink-mid);
+  font-size:14px; font-family:'Noto Sans JP',sans-serif; cursor:pointer;
+}
+.edit-save-btn {
+  flex:2; padding:11px 20px; background:var(--accent); color:#fff;
+  border:none; border-radius:10px; font-size:14px;
+  font-family:'Noto Sans JP',sans-serif; font-weight:500;
+  cursor:pointer; -webkit-tap-highlight-color:transparent;
+  transition:opacity 0.15s;
+}
+.edit-save-btn:disabled { opacity:0.4; cursor:default; }
+
+/* 編集ボタン */
+.edit-btn {
+  display:inline-flex; align-items:center; gap:4px;
+  margin-top:10px; padding:7px 13px;
+  background:transparent; border:1px solid var(--indigo-border);
+  border-radius:8px; color:var(--indigo); font-size:12px;
+  font-family:'Noto Sans JP',sans-serif; cursor:pointer;
+  -webkit-tap-highlight-color:transparent; transition:all 0.15s;
+}
+.edit-btn:hover { background:var(--indigo-light); }
+.edit-btn:active { opacity:0.8; }
+
 /* Animations */
 .dots-wrap { display:flex; gap:5px; align-items:center; }
 .dot { width:5px; height:5px; border-radius:50%; background:var(--accent); animation:blink 1.2s ease-in-out infinite; }
@@ -370,6 +448,40 @@ body { background: var(--bg); font-family: 'Noto Serif JP','Hiragino Mincho ProN
         </div>
       </div>
     </div>
+    <!-- 編集モーダル -->
+    <div class="edit-modal-overlay" id="editModalOverlay" onclick="handleEditOverlayClick(event)">
+      <div class="edit-modal">
+        <div class="edit-modal-header">
+          <span>アイデアを編集</span>
+          <button class="modal-close-btn" onclick="closeEditModal()">×</button>
+        </div>
+        <div>
+          <span class="edit-field-label">タイトル</span>
+          <input class="edit-input" id="editTitle" type="text" autocomplete="off"/>
+        </div>
+        <div>
+          <span class="edit-field-label">サマリー</span>
+          <textarea class="edit-textarea" id="editSummary" rows="3"></textarea>
+        </div>
+        <div>
+          <span class="edit-field-label">詳細</span>
+          <textarea class="edit-textarea" id="editDetail" rows="5"></textarea>
+        </div>
+        <div>
+          <span class="edit-field-label">アクションポイント</span>
+          <div class="edit-points-wrap">
+            <input class="edit-point-input" id="editPoint0" type="text" placeholder="ポイント 1" autocomplete="off"/>
+            <input class="edit-point-input" id="editPoint1" type="text" placeholder="ポイント 2" autocomplete="off"/>
+            <input class="edit-point-input" id="editPoint2" type="text" placeholder="ポイント 3" autocomplete="off"/>
+          </div>
+        </div>
+        <div class="edit-footer">
+          <button class="edit-cancel-btn" onclick="closeEditModal()">キャンセル</button>
+          <button class="edit-save-btn" id="editSaveBtn" onclick="saveEdit()">保存する</button>
+        </div>
+      </div>
+    </div>
+
     <div id="errorMsg" class="error-msg"></div>
     <div id="syncIndicator" class="sync-indicator">☁ 同期中…</div>
     <div id="generatingBar" class="generating-bar" style="display:none">
@@ -691,11 +803,66 @@ function renderAll() {
       <p class="detail-text">${escHtml(idea.detail)}</p>
       <ul class="points-list">${idea.points.map(p=>`<li class="point-item"><span class="point-arrow">▸</span><span>${escHtml(p)}</span></li>`).join('')}</ul>
       <p class="raw-note">メモ原文: ${escHtml(idea.raw)}</p>
+      <button class="edit-btn" onclick="event.stopPropagation();openEditModal(${idea.id})">✎ 編集する</button>
     </div>`;
     card.innerHTML = html; list.appendChild(card);
   });
 }
 
+
+// ── 編集モーダル ────────────────────────────────────
+let editingId = null;
+
+window.openEditModal = (id) => {
+  const idea = ideas.find(i => i.id === id);
+  if (!idea) return;
+  editingId = id;
+  document.getElementById('editTitle').value   = idea.title   || '';
+  document.getElementById('editSummary').value = idea.summary || '';
+  document.getElementById('editDetail').value  = idea.detail  || '';
+  const pts = idea.points || [];
+  document.getElementById('editPoint0').value = pts[0] || '';
+  document.getElementById('editPoint1').value = pts[1] || '';
+  document.getElementById('editPoint2').value = pts[2] || '';
+  document.getElementById('editModalOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('editTitle').focus(), 100);
+};
+
+window.closeEditModal = () => {
+  document.getElementById('editModalOverlay').classList.remove('open');
+  editingId = null;
+};
+
+window.handleEditOverlayClick = (e) => {
+  if (e.target === document.getElementById('editModalOverlay')) closeEditModal();
+};
+
+window.saveEdit = async () => {
+  if (!editingId) return;
+  const idea = ideas.find(i => i.id === editingId);
+  if (!idea) return;
+  const saveBtn = document.getElementById('editSaveBtn');
+  saveBtn.disabled = true;
+  saveBtn.textContent = '保存中…';
+  try {
+    const updated = {
+      ...idea,
+      title:   document.getElementById('editTitle').value.trim()   || idea.title,
+      summary: document.getElementById('editSummary').value.trim() || idea.summary,
+      detail:  document.getElementById('editDetail').value.trim()  || idea.detail,
+      points: [
+        document.getElementById('editPoint0').value.trim() || idea.points[0],
+        document.getElementById('editPoint1').value.trim() || idea.points[1],
+        document.getElementById('editPoint2').value.trim() || idea.points[2],
+      ]
+    };
+    await saveIdeaToDb(updated);
+    closeEditModal();
+  } catch(e) {
+    saveBtn.textContent = 'エラーが発生しました';
+    setTimeout(() => { saveBtn.textContent = '保存する'; saveBtn.disabled = false; }, 2000);
+  }
+};
 
 // ── Service Worker ────────────────────────────────────
 if ('serviceWorker' in navigator) {
