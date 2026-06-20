@@ -229,6 +229,88 @@ body { background: var(--bg); font-family: 'Noto Serif JP','Hiragino Mincho ProN
 .edit-btn:hover { background:var(--indigo-light); }
 .edit-btn:active { opacity:0.8; }
 
+/* ── 共有ポップアップ ── */
+.share-popup-overlay {
+  display:none; position:fixed; inset:0; z-index:450;
+  background:rgba(0,0,0,0.5); align-items:flex-end;
+  justify-content:center;
+}
+.share-popup-overlay.open { display:flex; }
+.share-popup {
+  background:var(--surface); border-radius:20px 20px 0 0;
+  width:100%; max-width:min(var(--max-w), 100vw);
+  padding:16px 16px calc(20px + var(--safe-bottom));
+  box-shadow:0 -8px 32px rgba(0,0,0,0.15);
+  box-sizing:border-box;
+}
+.share-popup-header {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:14px;
+}
+.share-popup-title {
+  font-size:13px; font-weight:500; color:var(--ink-soft);
+  font-family:'Noto Sans JP',sans-serif;
+}
+.share-copied-badge {
+  display:none; font-size:11px; color:var(--teal);
+  font-family:'Noto Sans JP',sans-serif; font-weight:500;
+  background:var(--teal-light); border:1px solid var(--teal-border);
+  border-radius:99px; padding:2px 10px;
+}
+.share-copied-badge.show { display:inline; }
+.share-mode-row {
+  display:flex; gap:8px; margin-bottom:14px;
+}
+.share-mode-btn {
+  flex:1; padding:10px 8px; border-radius:10px;
+  border:1px solid var(--border); background:var(--surface);
+  color:var(--ink); font-size:13px; font-family:'Noto Sans JP',sans-serif;
+  cursor:pointer; line-height:1.5; text-align:center;
+  -webkit-tap-highlight-color:transparent; transition:all 0.15s;
+}
+.share-mode-btn.active {
+  border:2px solid var(--indigo); background:var(--indigo-light);
+  color:var(--indigo); font-weight:500;
+}
+.share-ai-list { display:flex; flex-direction:column; border:1px solid var(--border); border-radius:12px; overflow:hidden; margin-bottom:10px; }
+.share-ai-btn {
+  display:flex; align-items:center; gap:12px;
+  padding:14px 16px; background:var(--surface); border:none;
+  border-bottom:1px solid var(--border-light); cursor:pointer;
+  text-align:left; width:100%;
+  -webkit-tap-highlight-color:transparent; transition:background 0.1s;
+}
+.share-ai-btn:last-child { border-bottom:none; }
+.share-ai-btn:active { background:var(--surface-hover); }
+@media (hover:hover) { .share-ai-btn:hover { background:var(--surface-hover); } }
+.share-ai-icon {
+  width:32px; height:32px; border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; font-size:14px; font-weight:700; color:#fff;
+}
+.share-ai-name { flex:1; font-size:14px; color:var(--ink); font-family:'Noto Sans JP',sans-serif; }
+.share-ai-domain { font-size:11px; color:var(--ink-soft); font-family:'Noto Sans JP',sans-serif; }
+.share-ai-arrow { font-size:14px; color:var(--ink-faint); }
+.share-hint {
+  font-size:11px; color:var(--ink-faint); text-align:center;
+  font-family:'Noto Sans JP',sans-serif; line-height:1.6;
+}
+
+/* 詳細カード下部のボタン行 */
+.card-action-row {
+  display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;
+}
+.share-btn {
+  display:inline-flex; align-items:center; gap:4px;
+  padding:7px 13px;
+  background:transparent; border:1px solid var(--teal-border);
+  border-radius:8px; color:var(--teal); font-size:12px;
+  font-family:'Noto Sans JP',sans-serif; cursor:pointer;
+  -webkit-tap-highlight-color:transparent; transition:all 0.15s;
+}
+.share-btn:hover { background:var(--teal-light); }
+.share-btn:active { opacity:0.8; }
+
 /* Animations */
 .dots-wrap { display:flex; gap:5px; align-items:center; }
 .dot { width:5px; height:5px; border-radius:50%; background:var(--accent); animation:blink 1.2s ease-in-out infinite; }
@@ -479,6 +561,40 @@ body { background: var(--bg); font-family: 'Noto Serif JP','Hiragino Mincho ProN
           <button class="edit-cancel-btn" onclick="closeEditModal()">キャンセル</button>
           <button class="edit-save-btn" id="editSaveBtn" onclick="saveEdit()">保存する</button>
         </div>
+      </div>
+    </div>
+
+    <!-- 共有ポップアップ -->
+    <div class="share-popup-overlay" id="sharePopupOverlay" onclick="handleShareOverlayClick(event)">
+      <div class="share-popup">
+        <div class="share-popup-header">
+          <span class="share-popup-title">何をしたいですか？</span>
+          <span class="share-copied-badge" id="shareCopiedBadge">✓ コピーしました</span>
+          <button class="modal-close-btn" onclick="closeSharePopup()">×</button>
+        </div>
+        <div class="share-mode-row">
+          <button class="share-mode-btn active" id="shareModeA" onclick="selectShareMode('brainstorm')">💡 壁打ち・<br>深掘り</button>
+          <button class="share-mode-btn" id="shareModeB" onclick="selectShareMode('critique')">🔍 批評・<br>リスク洗い出し</button>
+        </div>
+        <div class="share-ai-list">
+          <button class="share-ai-btn" onclick="openAI('gemini')">
+            <div class="share-ai-icon" style="background:#1B73E8">G</div>
+            <div>
+              <div class="share-ai-name">Gemini で開く</div>
+              <div class="share-ai-domain">gemini.google.com</div>
+            </div>
+            <span class="share-ai-arrow">↗</span>
+          </button>
+          <button class="share-ai-btn" onclick="openAI('chatgpt')">
+            <div class="share-ai-icon" style="background:#10A37F">GP</div>
+            <div>
+              <div class="share-ai-name">ChatGPT で開く</div>
+              <div class="share-ai-domain">chatgpt.com</div>
+            </div>
+            <span class="share-ai-arrow">↗</span>
+          </button>
+        </div>
+        <p class="share-hint">開いたら貼り付け（長押し → ペースト）してください</p>
       </div>
     </div>
 
@@ -803,12 +919,73 @@ function renderAll() {
       <p class="detail-text">${escHtml(idea.detail)}</p>
       <ul class="points-list">${idea.points.map(p=>`<li class="point-item"><span class="point-arrow">▸</span><span>${escHtml(p)}</span></li>`).join('')}</ul>
       <p class="raw-note">メモ原文: ${escHtml(idea.raw)}</p>
-      <button class="edit-btn" onclick="event.stopPropagation();openEditModal(${idea.id})">✎ 編集する</button>
+      <div class="card-action-row">
+        <button class="edit-btn" onclick="event.stopPropagation();openEditModal(${idea.id})">✎ 編集する</button>
+        <button class="share-btn" onclick="event.stopPropagation();openSharePopup(${idea.id})">↗ コピーして共有</button>
+      </div>
     </div>`;
     card.innerHTML = html; list.appendChild(card);
   });
 }
 
+
+// ── 共有ポップアップ ────────────────────────────────
+let sharingId = null;
+let shareMode = 'brainstorm';
+
+window.openSharePopup = (id) => {
+  sharingId = id;
+  shareMode = 'brainstorm';
+  document.getElementById('shareModeA').classList.add('active');
+  document.getElementById('shareModeB').classList.remove('active');
+  document.getElementById('shareCopiedBadge').classList.remove('show');
+  document.getElementById('sharePopupOverlay').classList.add('open');
+};
+
+window.closeSharePopup = () => {
+  document.getElementById('sharePopupOverlay').classList.remove('open');
+  sharingId = null;
+};
+
+window.handleShareOverlayClick = (e) => {
+  if (e.target === document.getElementById('sharePopupOverlay')) closeSharePopup();
+};
+
+window.selectShareMode = (mode) => {
+  shareMode = mode;
+  document.getElementById('shareModeA').classList.toggle('active', mode === 'brainstorm');
+  document.getElementById('shareModeB').classList.toggle('active', mode === 'critique');
+};
+
+function buildShareText(idea, mode) {
+  const intro = mode === 'brainstorm'
+    ? '以下のアイデアについて壁打ちをお願いします。\n気になる点の深掘り・具体的な次のステップを教えてください。'
+    : '以下のアイデアについて批評をお願いします。\nリスク・弱点・見落としている点を厳しく指摘してください。';
+  const points = (idea.points || []).map(p => '・' + p).join('\n');
+  return `${intro}\n\n【タイトル】\n${idea.title}\n\n【サマリー】\n${idea.summary}\n\n【詳細】\n${idea.detail}\n\n【アクションポイント】\n${points}`;
+}
+
+window.openAI = async (service) => {
+  const idea = ideas.find(i => i.id === sharingId);
+  if (!idea) return;
+  const text = buildShareText(idea, shareMode);
+  try {
+    await navigator.clipboard.writeText(text);
+    document.getElementById('shareCopiedBadge').classList.add('show');
+  } catch(e) {
+    // クリップボード失敗時はフォールバック
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    document.getElementById('shareCopiedBadge').classList.add('show');
+  }
+  const urls = {
+    gemini:  'https://gemini.google.com/',
+    chatgpt: 'https://chatgpt.com/'
+  };
+  setTimeout(() => { window.open(urls[service], '_blank'); }, 300);
+};
 
 // ── 編集モーダル ────────────────────────────────────
 let editingId = null;
