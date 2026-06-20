@@ -857,6 +857,8 @@ window.saveEdit = async () => {
       ]
     };
     await saveIdeaToDb(updated);
+    saveBtn.disabled = false;
+    saveBtn.textContent = '保存する';
     closeEditModal();
   } catch(e) {
     saveBtn.textContent = 'エラーが発生しました';
