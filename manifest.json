@@ -1,6 +1,6 @@
 {
-  "name": "アイデア帳",
-  "short_name": "アイデア帳",
+  "name": "Idea Loom",
+  "short_name": "Idea Loom",
   "description": "AIがアイデアを自動展開するメモアプリ",
   "start_url": "/",
   "display": "standalone",
