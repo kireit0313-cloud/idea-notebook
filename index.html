@@ -59,11 +59,11 @@ body { background: var(--bg); font-family: 'Noto Serif JP','Hiragino Mincho ProN
 .legal-links a { color:var(--ink-soft); text-decoration:underline; }
 
 /* ── オンボーディング（使い方ステップ）── */
-.how-steps { display:flex; align-items:center; gap:10px; margin:1.5rem auto 1.75rem; justify-content:center; flex-wrap:wrap; }
-.how-step { display:flex; flex-direction:column; align-items:center; gap:6px; }
-.how-num { width:28px; height:28px; border-radius:50%; background:var(--accent); color:#fff; font-size:13px; font-weight:600; font-family:'Noto Sans JP',sans-serif; display:flex; align-items:center; justify-content:center; }
-.how-text { font-size:11px; color:var(--ink-mid); font-family:'Noto Sans JP',sans-serif; line-height:1.6; text-align:center; }
-.how-arrow { color:var(--ink-faint); font-size:16px; margin-top:-10px; }
+.how-steps { display:flex; align-items:flex-start; gap:4px; margin:1.5rem auto 1.75rem; justify-content:center; flex-wrap:nowrap; width:100%; box-sizing:border-box; }
+.how-step { display:flex; flex-direction:column; align-items:center; gap:6px; flex:1; min-width:0; }
+.how-num { width:26px; height:26px; border-radius:50%; background:var(--accent); color:#fff; font-size:12px; font-weight:600; font-family:'Noto Sans JP',sans-serif; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.how-text { font-size:10px; color:var(--ink-mid); font-family:'Noto Sans JP',sans-serif; line-height:1.6; text-align:center; word-break:keep-all; }
+.how-arrow { color:var(--ink-faint); font-size:14px; margin-top:6px; flex-shrink:0; }
 
 /* ── 空状態のヒント ── */
 .empty-hint { margin-top:1rem; font-size:13px; color:var(--ink-soft); font-family:'Noto Sans JP',sans-serif; line-height:1.8; }
@@ -615,23 +615,23 @@ body { background: var(--bg); font-family: 'Noto Serif JP','Hiragino Mincho ProN
       <div class="empty-hint">
         <p>思いついたアイデアのタネをひとことメモするだけ。<br>AIが自動でタイトル・サマリー・詳細・アクションポイントに展開し、GeminiやChatGPTへ渡す素材を整えます。</p>
         <div class="empty-example">
-          <span class="empty-example-label">📋 入力例（そのままコピーして試せます）</span>
-          <div style="display:flex;flex-direction:column;gap:6px;margin-top:2px;">
-            <div style="display:flex;align-items:baseline;gap:6px;">
-              <span style="font-size:10px;color:var(--accent);font-weight:600;white-space:nowrap;">ビジネス</span>
-              <span>「近所のコーヒースタンドをサブスク制にしたい」</span>
+          <span class="empty-example-label">入力例</span>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:6px;">
+            <div style="display:flex;align-items:baseline;gap:8px;">
+              <span style="font-size:9px;color:var(--ink-faint);font-family:'Noto Sans JP',sans-serif;white-space:nowrap;border:1px solid var(--border);border-radius:4px;padding:1px 5px;letter-spacing:0.04em;">BIZ</span>
+              <span>近所のコーヒースタンドをサブスク制にしたい</span>
             </div>
-            <div style="display:flex;align-items:baseline;gap:6px;">
-              <span style="font-size:10px;color:var(--teal);font-weight:600;white-space:nowrap;">生活</span>
-              <span>「朝のルーティンを見直して集中力を上げたい」</span>
+            <div style="display:flex;align-items:baseline;gap:8px;">
+              <span style="font-size:9px;color:var(--ink-faint);font-family:'Noto Sans JP',sans-serif;white-space:nowrap;border:1px solid var(--border);border-radius:4px;padding:1px 5px;letter-spacing:0.04em;">LIFE</span>
+              <span>朝のルーティンを見直して集中力を上げたい</span>
             </div>
-            <div style="display:flex;align-items:baseline;gap:6px;">
-              <span style="font-size:10px;color:var(--indigo);font-weight:600;white-space:nowrap;">学習</span>
-              <span>「英語学習をゲーム感覚で続ける仕組みを作りたい」</span>
+            <div style="display:flex;align-items:baseline;gap:8px;">
+              <span style="font-size:9px;color:var(--ink-faint);font-family:'Noto Sans JP',sans-serif;white-space:nowrap;border:1px solid var(--border);border-radius:4px;padding:1px 5px;letter-spacing:0.04em;">EDU</span>
+              <span>英語学習をゲーム感覚で続ける仕組みを作りたい</span>
             </div>
-            <div style="display:flex;align-items:baseline;gap:6px;">
-              <span style="font-size:10px;color:var(--ink-mid);font-weight:600;white-space:nowrap;">趣味</span>
-              <span>「キャンプ道具を自作してみたい、どこから始めるか」</span>
+            <div style="display:flex;align-items:baseline;gap:8px;">
+              <span style="font-size:9px;color:var(--ink-faint);font-family:'Noto Sans JP',sans-serif;white-space:nowrap;border:1px solid var(--border);border-radius:4px;padding:1px 5px;letter-spacing:0.04em;">PLAY</span>
+              <span>キャンプ道具を自作してみたい、どこから始めるか</span>
             </div>
           </div>
         </div>
