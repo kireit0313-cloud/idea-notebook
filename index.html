@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>アイデア帳</title>
+<title>Idea Loom</title>
 
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#C4652A">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="アイデア帳">
+<meta name="apple-mobile-web-app-title" content="Idea Loom">
 <link rel="apple-touch-icon" href="icon-192.png">
 
 <!-- Fonts -->
@@ -437,25 +437,25 @@ body { background: var(--bg); font-family: 'Noto Serif JP','Hiragino Mincho ProN
     <p style="font-size:13px;color:var(--ink-soft);font-family:'Noto Sans JP',sans-serif;">ロード中…</p>
   </div>
   <div class="loading-box">
-    <div class="loading-logo">🗒</div>
-    <div class="loading-title">アイデア帳</div>
-    <div class="loading-sub">メモを入力するだけで、AIがアイデアを自動展開</div>
+    <div class="loading-logo">🪡</div>
+    <div class="loading-title">Idea Loom</div>
+    <div class="loading-sub">アイデアのタネを織り上げ、外部AIへ渡す橋渡しアプリ</div>
 
     <!-- 使い方3ステップ -->
     <div class="how-steps">
       <div class="how-step">
         <div class="how-num">1</div>
-        <div class="how-text">アイデアのタネを<br>メモする</div>
+        <div class="how-text">思いついたことを<br>ひとことメモ</div>
       </div>
       <div class="how-arrow">→</div>
       <div class="how-step">
         <div class="how-num">2</div>
-        <div class="how-text">AIが自動で<br>タイトル・詳細を生成</div>
+        <div class="how-text">AIがタイトル・詳細・<br>ポイントを自動生成</div>
       </div>
       <div class="how-arrow">→</div>
       <div class="how-step">
         <div class="how-num">3</div>
-        <div class="how-text">全端末で<br>同期・管理</div>
+        <div class="how-text">GeminiやChatGPTへ<br>コピーして深掘り</div>
       </div>
     </div>
 
@@ -485,7 +485,7 @@ body { background: var(--bg); font-family: 'Noto Serif JP','Hiragino Mincho ProN
     <div class="topbar-inner">
       <div class="topbar-left">
         <div style="display:flex;align-items:center;gap:8px">
-          <span class="app-title">アイデア帳</span>
+          <span class="app-title">Idea Loom</span>
           <span class="ai-badge">AI 自動生成</span>
         </div>
         <div class="user-info">
@@ -610,14 +610,30 @@ body { background: var(--bg); font-family: 'Noto Serif JP','Hiragino Mincho ProN
       <span>AIがアイデアを展開中です… <span style="font-size:11px;opacity:0.7;">（通常5〜15秒ほどかかります）</span></span>
     </div>
     <div id="emptyState" class="empty">
-      <div class="empty-icon">✦</div>
-      <div class="empty-text">まだアイデアがありません</div>
+      <div class="empty-icon">🪡</div>
+      <div class="empty-text">Idea Loom へようこそ</div>
       <div class="empty-hint">
-        <p>上の入力欄にアイデアのタネとなる<br>メモを入力して「追加 →」を押してみましょう。</p>
-        <p style="margin-top:0.75rem;">AIが自動でタイトル・サマリー・詳細・<br>アクションポイントを生成します。</p>
+        <p>思いついたアイデアのタネをひとことメモするだけ。<br>AIが自動でタイトル・サマリー・詳細・アクションポイントに展開し、GeminiやChatGPTへ渡す素材を整えます。</p>
         <div class="empty-example">
-          <span class="empty-example-label">入力例</span>
-          <span>「朝の習慣を整えたい」「副業のアイデア」「旅行の計画」</span>
+          <span class="empty-example-label">📋 入力例（そのままコピーして試せます）</span>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-top:2px;">
+            <div style="display:flex;align-items:baseline;gap:6px;">
+              <span style="font-size:10px;color:var(--accent);font-weight:600;white-space:nowrap;">ビジネス</span>
+              <span>「近所のコーヒースタンドをサブスク制にしたい」</span>
+            </div>
+            <div style="display:flex;align-items:baseline;gap:6px;">
+              <span style="font-size:10px;color:var(--teal);font-weight:600;white-space:nowrap;">生活</span>
+              <span>「朝のルーティンを見直して集中力を上げたい」</span>
+            </div>
+            <div style="display:flex;align-items:baseline;gap:6px;">
+              <span style="font-size:10px;color:var(--indigo);font-weight:600;white-space:nowrap;">学習</span>
+              <span>「英語学習をゲーム感覚で続ける仕組みを作りたい」</span>
+            </div>
+            <div style="display:flex;align-items:baseline;gap:6px;">
+              <span style="font-size:10px;color:var(--ink-mid);font-weight:600;white-space:nowrap;">趣味</span>
+              <span>「キャンプ道具を自作してみたい、どこから始めるか」</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
