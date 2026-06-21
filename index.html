@@ -15,6 +15,7 @@
 
 <!-- Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600&family=Noto+Sans+JP:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" rel="stylesheet">
 
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -573,8 +574,8 @@ body { background: var(--bg); font-family: 'Noto Serif JP','Hiragino Mincho ProN
           <button class="modal-close-btn" onclick="closeSharePopup()">×</button>
         </div>
         <div class="share-mode-row">
-          <button class="share-mode-btn active" id="shareModeA" onclick="selectShareMode('brainstorm')">💡 壁打ち・<br>深掘り</button>
-          <button class="share-mode-btn" id="shareModeB" onclick="selectShareMode('critique')">🔍 批評・<br>リスク洗い出し</button>
+          <button class="share-mode-btn active" id="shareModeA" onclick="selectShareMode('brainstorm')"><i class="ti ti-shovel" style="font-size:20px;display:block;margin-bottom:4px;"></i>壁打ち・深掘り</button>
+          <button class="share-mode-btn" id="shareModeB" onclick="selectShareMode('critique')"><i class="ti ti-microscope" style="font-size:20px;display:block;margin-bottom:4px;"></i>批評・リスク洗い出し</button>
         </div>
         <div class="share-ai-list">
           <button class="share-ai-btn" onclick="openAI('gemini')">
