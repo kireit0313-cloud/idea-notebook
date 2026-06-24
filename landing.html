@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Idea Loom — アイデアのタネを、育てる場所。</title>
+<meta name="description" content="思いついたことをメモするだけ。AIがアイデアを整理して、あなたの副業・起業の一歩を後押しします。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream: #FDFAF6;
+    --cream-dark: #F0EAE0;
+    --terracotta: #C4652A;
+    --terracotta-light: #E87B3A;
+    --teal: #2A7B6F;
+    --teal-light: #3A9B8C;
+    --indigo: #3D4FA0;
+    --ink: #1A1A1A;
+    --ink-mid: #444;
+    --ink-light: #777;
+    --card-shadow: 0 4px 24px rgba(0,0,0,0.10);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    font-size: 16px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 40px;
+    background: rgba(253,250,246,0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(196,101,42,0.12);
+  }
+  .nav-logo {
+    font-family: 'Noto Serif JP', serif;
+    font-weight: 900;
+    font-size: 1.2rem;
+    color: var(--terracotta);
+    text-decoration: none;
+    letter-spacing: 0.02em;
+  }
+  .nav-cta {
+    background: var(--terracotta);
+    color: #fff;
+    padding: 10px 24px;
+    border-radius: 100px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .nav-cta:hover { background: var(--terracotta-light); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 120px 24px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -120px; right: -180px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(196,101,42,0.10) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -100px; left: -150px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(42,123,111,0.10) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* 巨大装飾文字 */
+  .hero-deco {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 900;
+    font-size: clamp(12rem, 28vw, 24rem);
+    color: rgba(196,101,42,0.055);
+    line-height: 1;
+    user-select: none;
+    pointer-events: none;
+    z-index: 0;
+    letter-spacing: -0.06em;
+    white-space: nowrap;
+  }
+
+  .hero-eyebrow {
+    display: inline-block;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--teal);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    padding: 6px 16px;
+    border: 1.5px solid var(--teal);
+    border-radius: 100px;
+    position: relative;
+    z-index: 1;
+  }
+  .hero-headline {
+    font-family: 'Noto Serif JP', serif;
+    font-weight: 900;
+    font-size: clamp(2.2rem, 6vw, 3.8rem);
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    margin-bottom: 12px;
+    position: relative;
+    z-index: 1;
+  }
+  .hero-headline em {
+    font-style: normal;
+    color: var(--terracotta);
+  }
+  .hero-sub {
+    font-size: clamp(1rem, 2.5vw, 1.2rem);
+    color: var(--ink-mid);
+    max-width: 520px;
+    margin: 20px auto 40px;
+    line-height: 1.8;
+    position: relative;
+    z-index: 1;
+  }
+  .hero-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+  }
+  .btn-primary {
+    background: var(--terracotta);
+    color: #fff;
+    padding: 16px 36px;
+    border-radius: 100px;
+    font-size: 1rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.15s;
+    box-shadow: 0 4px 16px rgba(196,101,42,0.30);
+  }
+  .btn-primary:hover { background: var(--terracotta-light); transform: translateY(-2px); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--ink-mid);
+    padding: 16px 28px;
+    border-radius: 100px;
+    font-size: 1rem;
+    font-weight: 500;
+    text-decoration: none;
+    border: 1.5px solid var(--cream-dark);
+    transition: border-color 0.2s;
+  }
+  .btn-secondary:hover { border-color: var(--ink-light); }
+  .hero-note {
+    margin-top: 16px;
+    font-size: 0.8rem;
+    color: var(--ink-light);
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── MOCK APP ── */
+  .mock-section {
+    padding: 0 24px 80px;
+    display: flex;
+    justify-content: center;
+  }
+  .mock-phone {
+    width: 320px;
+    background: #fff;
+    border-radius: 28px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.06);
+  }
+  .mock-topbar {
+    background: var(--cream);
+    padding: 16px 20px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--cream-dark);
+  }
+  .mock-logo {
+    font-family: 'Noto Serif JP', serif;
+    font-weight: 900;
+    font-size: 1rem;
+    color: var(--terracotta);
+  }
+  .mock-avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--teal);
+    opacity: 0.7;
+  }
+  .mock-cards {
+    padding: 16px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .mock-card {
+    border-radius: 14px;
+    padding: 14px 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .mock-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+  }
+  .mock-card.c1 { background: rgba(196,101,42,0.07); }
+  .mock-card.c1::before { background: var(--terracotta); }
+  .mock-card.c2 { background: rgba(42,123,111,0.07); }
+  .mock-card.c2::before { background: var(--teal); }
+  .mock-card.c3 { background: rgba(61,79,160,0.07); }
+  .mock-card.c3::before { background: var(--indigo); }
+  .mock-card-title {
+    font-family: 'Noto Serif JP', serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    margin-bottom: 6px;
+    padding-left: 8px;
+  }
+  .mock-card-body {
+    font-size: 0.72rem;
+    color: var(--ink-mid);
+    line-height: 1.6;
+    padding-left: 8px;
+  }
+  .mock-input-bar {
+    padding: 12px 14px;
+    border-top: 1px solid var(--cream-dark);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .mock-input {
+    flex: 1;
+    background: var(--cream-dark);
+    border-radius: 100px;
+    height: 36px;
+    padding: 0 14px;
+    font-size: 0.72rem;
+    color: var(--ink-light);
+    display: flex;
+    align-items: center;
+  }
+  .mock-send {
+    width: 36px; height: 36px;
+    background: var(--terracotta);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .mock-send::after {
+    content: '↑';
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+
+  /* ── PAIN ── */
+  .pain-section {
+    background: var(--ink);
+    color: #fff;
+    padding: 80px 24px;
+    text-align: center;
+  }
+  .pain-section h2 {
+    font-family: 'Noto Serif JP', serif;
+    font-weight: 900;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    line-height: 1.5;
+    margin-bottom: 48px;
+  }
+  .pain-section h2 span { color: var(--terracotta-light); }
+  .pain-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 500px;
+    margin: 0 auto;
+    text-align: left;
+  }
+  .pain-item {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    padding: 16px 20px;
+    border-left: 3px solid var(--terracotta);
+  }
+  .pain-emoji { font-size: 1.3rem; flex-shrink: 0; margin-top: 2px; }
+  .pain-text { font-size: 0.95rem; color: rgba(255,255,255,0.85); line-height: 1.7; }
+
+  /* ── HOW ── */
+  .how-section {
+    padding: 100px 24px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .section-eyebrow {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-family: 'Noto Serif JP', serif;
+    font-weight: 900;
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    line-height: 1.4;
+    margin-bottom: 56px;
+  }
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 32px;
+  }
+  .step {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .step-num {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Noto Serif JP', serif;
+    font-weight: 900;
+    font-size: 1.2rem;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .step:nth-child(1) .step-num { background: var(--terracotta); }
+  .step:nth-child(2) .step-num { background: var(--teal); }
+  .step:nth-child(3) .step-num { background: var(--indigo); }
+  .step:nth-child(4) .step-num { background: var(--ink); }
+  .step-title {
+    font-family: 'Noto Serif JP', serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+  }
+  .step-desc {
+    font-size: 0.9rem;
+    color: var(--ink-mid);
+    line-height: 1.8;
+  }
+  .step-example {
+    background: var(--cream-dark);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 0.8rem;
+    color: var(--ink-mid);
+    border-left: 3px solid;
+    line-height: 1.7;
+  }
+  .step:nth-child(1) .step-example { border-color: var(--terracotta); }
+  .step:nth-child(2) .step-example { border-color: var(--teal); }
+  .step:nth-child(3) .step-example { border-color: var(--indigo); }
+  .step:nth-child(4) .step-example { border-color: var(--ink); }
+
+  /* ── FAQ ── */
+  .faq-section {
+    background: var(--cream-dark);
+    padding: 100px 24px;
+  }
+  .faq-inner {
+    max-width: 680px;
+    margin: 0 auto;
+  }
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-top: 48px;
+  }
+  .faq-item {
+    border-bottom: 1px solid rgba(0,0,0,0.10);
+    padding: 24px 0;
+  }
+  .faq-q {
+    font-family: 'Noto Serif JP', serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--ink);
+    margin-bottom: 10px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .faq-q::before {
+    content: 'Q';
+    color: var(--terracotta);
+    font-weight: 900;
+    flex-shrink: 0;
+  }
+  .faq-a {
+    font-size: 0.9rem;
+    color: var(--ink-mid);
+    line-height: 1.8;
+    padding-left: 24px;
+  }
+
+  /* ── ABOUT ── */
+  .about-section {
+    padding: 100px 24px;
+    max-width: 680px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .about-avatar {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--terracotta), var(--teal));
+    margin: 0 auto 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+  }
+  .about-name {
+    font-family: 'Noto Serif JP', serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 6px;
+  }
+  .about-role {
+    font-size: 0.8rem;
+    color: var(--ink-light);
+    margin-bottom: 24px;
+  }
+  .about-comment {
+    font-size: 1rem;
+    color: var(--ink-mid);
+    line-height: 1.9;
+    background: var(--cream-dark);
+    border-radius: 16px;
+    padding: 28px 32px;
+    text-align: left;
+    position: relative;
+  }
+  .about-comment::before {
+    content: '\201C';
+    font-family: 'Noto Serif JP', serif;
+    font-size: 4rem;
+    color: var(--terracotta);
+    opacity: 0.3;
+    position: absolute;
+    top: -8px;
+    left: 20px;
+    line-height: 1;
+  }
+
+  /* ── CTA ── */
+  .cta-section {
+    background: var(--terracotta);
+    padding: 100px 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 400px; height: 400px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 50%;
+  }
+  .cta-section::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: -60px;
+    width: 300px; height: 300px;
+    background: rgba(0,0,0,0.06);
+    border-radius: 50%;
+  }
+  .cta-section h2 {
+    font-family: 'Noto Serif JP', serif;
+    font-weight: 900;
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    color: #fff;
+    line-height: 1.4;
+    margin-bottom: 16px;
+    position: relative; z-index: 1;
+  }
+  .cta-section p {
+    color: rgba(255,255,255,0.85);
+    font-size: 1rem;
+    margin-bottom: 40px;
+    position: relative; z-index: 1;
+  }
+  .btn-white {
+    background: #fff;
+    color: var(--terracotta);
+    padding: 18px 48px;
+    border-radius: 100px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-block;
+    transition: transform 0.15s, box-shadow 0.15s;
+    position: relative; z-index: 1;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  }
+  .btn-white:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,0.2); }
+  .cta-note {
+    color: rgba(255,255,255,0.7);
+    font-size: 0.8rem;
+    margin-top: 16px;
+    position: relative; z-index: 1;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--ink);
+    color: rgba(255,255,255,0.5);
+    text-align: center;
+    padding: 32px 24px;
+    font-size: 0.8rem;
+  }
+  footer a { color: rgba(255,255,255,0.5); text-decoration: none; }
+  footer a:hover { color: #fff; }
+  .footer-links { display: flex; gap: 24px; justify-content: center; margin-bottom: 16px; flex-wrap: wrap; }
+
+  .about-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    border: 1.5px solid #E8F0FE;
+    border-radius: 100px;
+    padding: 8px 18px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #1a73e8;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(26,115,232,0.10);
+  }
+  .about-badge-icon {
+    width: 20px; height: 20px;
+    background: linear-gradient(135deg, #4285F4, #34A853, #FBBC05, #EA4335);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  @media (max-width: 600px) {
+    nav { padding: 14px 20px; }
+    .steps { grid-template-columns: 1fr; }
+    .about-comment { padding: 28px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo"><img src="icon-192.png" alt="Idea Loom" style="width:28px;vertical-align:middle;border-radius:5px;"><span style="color:#000;"> Idea Loom</span></a>
+  <a href="https://idea-notebook-vert.vercel.app/" class="nav-cta" target="_blank">無料で試す</a>
+</nav>
+  
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-deco">AI</div>
+  <span class="hero-eyebrow">AI × アイデア管理</span>
+  <h1 class="hero-headline">
+    そのアイデア、<br>
+    <em>もったいない</em>まま<br>
+    眠っていませんか？
+  </h1>
+  <p class="hero-sub">
+    思いついたことをひとことメモするだけ。<br>
+    AIが整理して、副業・起業の「次の一手」が見えてくる。
+  </p>
+  <div class="hero-buttons">
+    <a href="https://idea-notebook-vert.vercel.app/" class="btn-primary" target="_blank">今すぐ無料で使う</a>
+    <a href="#how" class="btn-secondary">使い方を見る</a>
+  </div>
+  <p class="hero-note">登録不要・広告なし・スマホで動くWebアプリ</p>
+</section>
+
+<!-- MOCK APP -->
+<div class="mock-section">
+  <div class="mock-phone">
+    <div class="mock-topbar">
+      <div class="mock-logo"><img src="icon-192.png" alt="Idea Loom" style="width:20px;vertical-align:middle;border-radius:5px;"><span style="color:#000;"> Idea Loom</span></div>
+      <div class="mock-avatar"></div>
+    </div>
+    <div class="mock-input-bar">
+      <div class="mock-input">アイデアのタネをメモする...</div>
+      <div class="mock-send"></div>
+    </div>
+    <div class="mock-cards">
+      <div class="mock-card c1">
+        <div class="mock-card-title">オンライン英会話講師として副業を始める</div>
+        <div class="mock-card-body">英検1級の資格を活かし、ビジネス英語に特化した講師として週末に副業展開する可能性を検討する。</div>
+      </div>
+      <div class="mock-card c2">
+        <div class="mock-card-title">ハンドメイドアクセサリーのEC販売</div>
+        <div class="mock-card-body">趣味で作っているアクセサリーをMinneやCreemaで販売。まず月3万円の目標から始める。</div>
+      </div>
+      <div class="mock-card c3">
+        <div class="mock-card-title">Webライターとして在宅ワークに挑戦</div>
+        <div class="mock-card-body">前職の金融知識を活かし、お金・投資ジャンルの記事を専門で書くWebライターを目指す。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAIN -->
+<section class="pain-section">
+  <h2>こんな経験、<span>ありませんか？</span></h2>
+  <div class="pain-list">
+    <div class="pain-item">
+      <span class="pain-emoji">💭</span>
+      <p class="pain-text">「副業やってみたいな」と思うけど、<br>何から始めればいいか整理できない</p>
+    </div>
+    <div class="pain-item">
+      <span class="pain-emoji">📝</span>
+      <p class="pain-text">メモアプリに書き留めたアイデアが<br>そのまま眠って放置されている</p>
+    </div>
+    <div class="pain-item">
+      <span class="pain-emoji">🤯</span>
+      <p class="pain-text">Geminiに相談しようとするけど、<br>何を入力すればいいかわからない</p>
+    </div>
+    <div class="pain-item">
+      <span class="pain-emoji">⏳</span>
+      <p class="pain-text">考えをまとめる時間がなくて<br>いつも「また今度」になってしまう</p>
+    </div>
+  </div>
+</section>
+
+<!-- HOW -->
+<section class="how-section" id="how">
+  <p class="section-eyebrow">How it works</p>
+  <h2 class="section-title">4ステップで、<br>アイデアが動き出す</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-title">タネをひとことメモ</div>
+      <div class="step-desc">思いついたことをそのまま入力。完璧じゃなくてOK。</div>
+      <div class="step-example">「副業でオンライン英会話講師をやってみたい。英検1級持ってる」</div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-title">AIが自動で整理</div>
+      <div class="step-desc">タイトル・サマリー・詳細・アクションポイントをAIが生成。</div>
+      <div class="step-example">「ビジネス英語特化の講師として週末副業。まずはSNSプロフィール作成から」</div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-title">自分の言葉で磨く</div>
+      <div class="step-desc">AIのたたき台を手動で編集してブラッシュアップ。</div>
+      <div class="step-example">気に入らない部分は直接書き直せる。自分だけのメモに育てる。</div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-title">外部AIで深掘り</div>
+      <div class="step-desc">整ったメモをGeminiやChatGPTにコピーして、さらに深く考える。</div>
+      <div class="step-example">「壁打ちモード」や「批評モード」で一発コピー&amp;貼り付け。</div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq-section" id="faq">
+  <div class="faq-inner">
+    <p class="section-eyebrow">FAQ</p>
+    <h2 class="section-title">よくある質問</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q">無料で使えますか？</div>
+        <div class="faq-a">はい、完全無料です。広告もありません。1日10回までAIでアイデアを整理できます。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">アプリのダウンロードは必要ですか？</div>
+        <div class="faq-a">不要です。スマホのブラウザ（ChromeやSafari）からそのまま使えます。ホーム画面に追加すれば、アプリのように使えます。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">登録は必要ですか？</div>
+        <div class="faq-a">Googleアカウントでのログインが必要です。メモをクラウドに保存してどこからでも見られるようにするためです。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">入力したメモは他の人に見られますか？</div>
+        <div class="faq-a">いいえ。メモはあなたのアカウントにのみ紐付いて保存されます。他のユーザーや第三者が閲覧することはありません。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">副業・起業以外のアイデアにも使えますか？</div>
+        <div class="faq-a">もちろんです。旅行の計画、学びたいこと、日常のひらめきなど、何でもOKです。とにかく「頭の中のモヤモヤ」を整理するのに向いています。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about-section">
+  <div class="about-avatar">👤</div>
+  <div class="about-name">Tsuyoshi</div>
+  <div class="about-role">Idea Loom 開発者</div>
+  <div class="about-badge">
+    <a href="https://www.credly.com/badges/8c595798-6434-4120-9213-e39972875e63/public_url" target="_blank" style="text-decoration:none;color:#1a73e8;">
+    <img src="google-ai-pro.png" alt="Google AI Professional Logo" style="width:50px;vertical-align:middle;">　Google AI プロフェッショナル認定資格 保有</a>
+  </div>
+  <div class="about-comment">
+    「副業を始めようと思って、頭の中にアイデアはあるのに、整理できなくて動けない」という自分の悩みから作りました。Geminiに相談しようにも、何を入力すればいいかわからない。そんな「手前の段階」を助けるツールが欲しかったんです。まだ小さなアプリですが、同じ悩みを持つ人に届いてほしいと思っています。
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2>あなたのアイデアを、<br>眠らせたままにしない。</h2>
+  <p>今すぐ、最初のひとことをメモしてみてください。</p>
+  <a href="https://idea-notebook-vert.vercel.app/" class="btn-white" target="_blank">Idea Loomを無料で使う</a>
+  <p class="cta-note">登録不要・広告なし・スマホ対応</p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-links">
+    <a href="https://idea-notebook-vert.vercel.app/terms.html" target="_blank">利用規約</a>
+    <a href="https://idea-notebook-vert.vercel.app/privacy.html" target="_blank">プライバシーポリシー</a>
+    <a href="mailto:0313labo@gmail.com">お問い合わせ</a>
+  </div>
+  <p>© 2025 Idea Loom. All rights reserved.</p>
+</footer>
+
+</body>
+</html>

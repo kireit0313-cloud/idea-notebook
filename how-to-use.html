@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>使い方ガイド — Idea Loom</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="icon-192.png">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #FDFAF6; --surface: #FFFFFF;
+  --border: #E8E0D4;
+  --ink: #2C2416; --ink-mid: #6B5D4E; --ink-soft: #9E8E7E; --ink-faint: #C4B8AC;
+  --accent: #C4652A; --accent-light: #FFF1E8;
+  --teal: #2A7B6F; --teal-light: #EDF6F4; --teal-border: #B2D9D3;
+  --indigo: #3D4FA0; --indigo-light: #ECEFFE; --indigo-border: #BEC5E8;
+}
+html { background: var(--bg); }
+body {
+  font-family: 'Noto Serif JP', Georgia, serif;
+  color: var(--ink);
+  min-height: 100vh;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* ── Header ── */
+.header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.header-logo { width: 36px; height: 36px; border-radius: 9px; }
+.header-title { font-size: 17px; font-weight: 600; }
+.header-sub { font-size: 12px; color: var(--ink-soft); font-family: 'Noto Sans JP', sans-serif; }
+
+/* ── Main ── */
+.main { max-width: 600px; margin: 0 auto; padding: 32px 20px 60px; }
+
+/* ── Hero ── */
+.hero {
+  text-align: center;
+  margin-bottom: 40px;
+}
+.hero-title {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+.hero-desc {
+  font-size: 14px;
+  color: var(--ink-mid);
+  font-family: 'Noto Sans JP', sans-serif;
+  line-height: 1.9;
+}
+
+/* ── Section ── */
+.section { margin-bottom: 40px; }
+.section-label {
+  font-size: 11px;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+/* ── Steps ── */
+.step {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 28px;
+  align-items: flex-start;
+}
+.step-num {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: 'Noto Sans JP', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.step-body {}
+.step-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  line-height: 1.5;
+}
+.step-desc {
+  font-size: 13px;
+  color: var(--ink-mid);
+  font-family: 'Noto Sans JP', sans-serif;
+  line-height: 1.85;
+}
+
+/* ── Mock UI ── */
+.mock {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-top: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.mock-input {
+  padding: 14px 16px;
+  font-size: 14px;
+  color: var(--ink-mid);
+  font-family: 'Noto Sans JP', sans-serif;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.mock-input-text { color: var(--ink); }
+.mock-btn {
+  font-size: 12px;
+  color: var(--ink-soft);
+  font-family: 'Noto Sans JP', sans-serif;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 12px;
+  background: transparent;
+}
+.mock-card-header {
+  padding: 13px 16px;
+  border-left: 3px solid var(--accent);
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mock-card-header .badge {
+  font-size: 10px;
+  font-family: 'Noto Sans JP', sans-serif;
+  color: var(--ink-faint);
+  font-weight: 400;
+}
+.mock-summary {
+  padding: 12px 16px;
+  background: var(--teal-light);
+  border-left: 3px solid var(--teal);
+  border-top: 1px solid var(--teal-border);
+  font-size: 13px;
+  color: #1D4D47;
+  font-family: 'Noto Sans JP', sans-serif;
+  line-height: 1.8;
+}
+.mock-detail {
+  padding: 12px 16px;
+  background: var(--indigo-light);
+  border-left: 3px solid var(--indigo);
+  border-top: 1px solid var(--indigo-border);
+  font-size: 12px;
+  color: #252D5C;
+  font-family: 'Noto Sans JP', sans-serif;
+  line-height: 1.8;
+}
+.mock-points {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.mock-point {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 12px;
+}
+.mock-point-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--indigo);
+  color: #fff;
+  font-size: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.mock-actions {
+  padding: 10px 16px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 8px;
+}
+.mock-action-btn {
+  font-size: 11px;
+  font-family: 'Noto Sans JP', sans-serif;
+  color: var(--ink-soft);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 12px;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ── Share mock ── */
+.mock-share {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  margin-top: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.mock-share-header {
+  padding: 14px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+}
+.mock-share-modes {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.mock-share-mode {
+  flex: 1;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 8px;
+  text-align: center;
+  font-size: 12px;
+  font-family: 'Noto Sans JP', sans-serif;
+  color: var(--ink-soft);
+}
+.mock-share-mode.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-light);
+}
+.mock-share-ai {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.mock-share-ai-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+.mock-share-ai-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.mock-share-ai-name { font-size: 13px; font-weight: 500; color: var(--ink); }
+.mock-share-ai-domain { font-size: 11px; color: var(--ink-faint); }
+
+/* ── Tips ── */
+.tips {
+  background: var(--accent-light);
+  border: 1px solid rgba(196,101,42,0.2);
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-top: 12px;
+}
+.tips-title {
+  font-size: 12px;
+  font-weight: 700;
+  font-family: 'Noto Sans JP', sans-serif;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.tips-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.tips-list li {
+  font-size: 12px;
+  font-family: 'Noto Sans JP', sans-serif;
+  color: var(--ink-mid);
+  line-height: 1.7;
+  display: flex;
+  gap: 6px;
+}
+.tips-list li::before { content: "•"; color: var(--accent); flex-shrink: 0; }
+
+/* ── FAQ ── */
+.faq { display: flex; flex-direction: column; gap: 16px; }
+.faq-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 18px;
+}
+.faq-q {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: flex;
+  gap: 8px;
+}
+.faq-q::before {
+  content: "Q";
+  color: var(--accent);
+  font-family: 'Noto Sans JP', sans-serif;
+  flex-shrink: 0;
+}
+.faq-a {
+  font-size: 13px;
+  color: var(--ink-mid);
+  font-family: 'Noto Sans JP', sans-serif;
+  line-height: 1.85;
+  display: flex;
+  gap: 8px;
+}
+.faq-a::before {
+  content: "A";
+  color: var(--teal);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ── CTA ── */
+.cta {
+  text-align: center;
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border);
+}
+.cta-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.cta-desc {
+  font-size: 13px;
+  color: var(--ink-soft);
+  font-family: 'Noto Sans JP', sans-serif;
+  margin-bottom: 20px;
+  line-height: 1.8;
+}
+.cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  padding: 14px 28px;
+  font-size: 15px;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 4px 16px rgba(196,101,42,0.3);
+  transition: opacity 0.15s;
+}
+.cta-btn:active { opacity: 0.85; }
+
+/* ── Footer ── */
+.footer {
+  text-align: center;
+  padding: 24px 20px;
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--ink-faint);
+  font-family: 'Noto Sans JP', sans-serif;
+}
+.footer a { color: var(--ink-soft); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <img src="icon-192.png" alt="Idea Loom" class="header-logo">
+  <div>
+    <div class="header-title">Idea Loom</div>
+    <div class="header-sub">使い方ガイド</div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-title">アイデアのタネを、<br>AIと一緒に育てよう。</div>
+    <div class="hero-desc">
+      思いついたことをひとことメモするだけ。<br>
+      AIが自動でタイトル・サマリー・詳細・アクションポイントに展開し、<br>
+      GeminiやChatGPTへ渡す素材を整えてくれます。
+    </div>
+  </div>
+
+  <!-- Step 1 -->
+  <div class="section">
+    <div class="section-label">Step 1</div>
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-title">アイデアのタネをひとことメモ</div>
+        <div class="step-desc">
+          完成した文章でなくてOK。「〇〇やってみたい」「〇〇が気になる」という断片的なアイデアをそのまま入力してください。
+        </div>
+      </div>
+    </div>
+    <div class="mock">
+      <div class="mock-input">
+        <span class="mock-input-text">副業でオンライン英会話講師をやってみたい。英検1級を持っていて、ビジネス英語を教えられると思っている</span>
+        <span class="mock-btn">追加 →</span>
+      </div>
+    </div>
+    <div class="tips" style="margin-top:12px;">
+      <div class="tips-title">💡 入力のコツ</div>
+      <ul class="tips-list">
+        <li>「〇〇やってみたい」「〇〇が気になる」「〇〇を効率化したい」など、アイデアのタネとその理由をひとことプラスするとAIの精度が上がります</li>
+        <li>音声入力でも使えます（スマホのマイクボタンを活用）</li>
+        <li>BIZ・LIFE・EDU・PLAYなどジャンルを問わず何でもOK</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="section">
+    <div class="section-label">Step 2</div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-title">AIが自動でアイデアを展開</div>
+        <div class="step-desc">
+          「追加 →」を押すと、AIが5〜15秒でタイトル・サマリー・詳細・アクションポイント3つを自動生成します。カードをタップすると詳細が確認できます。
+        </div>
+      </div>
+    </div>
+    <div class="mock">
+      <div class="mock-card-header">
+        ビジネス英会話講師として副業を始める戦略
+        <span class="badge">AI生成</span>
+      </div>
+      <div class="mock-summary">
+        英検1級の資格を活かし、ビジネスパーソン向けのオンライン英会話を副業として立ち上げる方法を探る。
+      </div>
+      <div class="mock-detail">
+        ストアカやUdemyなどのプラットフォームを活用し、まず体験レッスンを無料で提供して実績を積む。ビジネス英語という専門性を武器に差別化することで、単価を上げやすくなる。
+        <div class="mock-points">
+          <div class="mock-point">
+            <div class="mock-point-dot">1</div>
+            <span>英検1級の資格と指導実績をプロフィールに明記する</span>
+          </div>
+          <div class="mock-point">
+            <div class="mock-point-dot">2</div>
+            <span>体験レッスンを3名に無料提供してレビューを集める</span>
+          </div>
+          <div class="mock-point">
+            <div class="mock-point-dot">3</div>
+            <span>競合講師の料金・レッスン内容を5件リサーチする</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="section">
+    <div class="section-label">Step 3</div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-title">必要なら内容を編集する</div>
+        <div class="step-desc">
+          AIの生成結果が気に入らない部分は「✎ 編集する」ボタンで自由に書き直せます。タイトル・サマリー・詳細・アクションポイントをすべて手動で修正できます。
+        </div>
+      </div>
+    </div>
+    <div class="mock">
+      <div class="mock-actions">
+        <div class="mock-action-btn">✎ 編集する</div>
+        <div class="mock-action-btn">↗ コピーして共有</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 4 -->
+  <div class="section">
+    <div class="section-label">Step 4</div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <div class="step-title">GeminiやChatGPTで深掘りする</div>
+        <div class="step-desc">
+          「↗ コピーして共有」ボタンをタップ。目的に合わせてモードを選び、GeminiかChatGPTのボタンを押すと、内容がクリップボードにコピーされて自動でそのサービスが開きます。あとは貼り付けるだけ。
+        </div>
+      </div>
+    </div>
+    <div class="mock-share">
+      <div class="mock-share-header">何をしたいですか？</div>
+      <div class="mock-share-modes">
+        <div class="mock-share-mode active">💡 壁打ち・深掘り</div>
+        <div class="mock-share-mode">🔍 批評・リスク洗い出し</div>
+      </div>
+      <div class="mock-share-ai">
+        <div class="mock-share-ai-btn">
+          <div class="mock-share-ai-icon" style="background:#1B73E8">G</div>
+          <div>
+            <div class="mock-share-ai-name">Gemini で開く</div>
+            <div class="mock-share-ai-domain">gemini.google.com</div>
+          </div>
+        </div>
+        <div class="mock-share-ai-btn">
+          <div class="mock-share-ai-icon" style="background:#10A37F">GP</div>
+          <div>
+            <div class="mock-share-ai-name">ChatGPT で開く</div>
+            <div class="mock-share-ai-domain">chatgpt.com</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tips">
+      <div class="tips-title">📋 貼り付け方法</div>
+      <ul class="tips-list">
+        <li>スマホ：AIサービスの入力欄を長押し → 「ペースト」をタップ</li>
+        <li>PC：入力欄をクリックして Ctrl+V（Mac は ⌘+V）</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="section">
+    <div class="section-label">よくある質問</div>
+    <div class="faq">
+      <div class="faq-item">
+        <div class="faq-q">料金はかかりますか？</div>
+        <div class="faq-a">無料でご利用いただけます。AI生成は1日10回まで無料です。Googleアカウントでのログインが必要です。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">アイデアはどこに保存されますか？</div>
+        <div class="faq-a">ログインしたGoogleアカウントに紐づいてクラウドに保存されます。スマホ・PCどちらからでも同じアイデアを確認できます。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">スマホのホーム画面に追加できますか？</div>
+        <div class="faq-a">はい。SafariまたはChromeで開いた後、「ホーム画面に追加」するとアプリのように使えます。LINEのブラウザからは直接開かず、ChromeかSafariにURLをコピーして開いてください。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">AI生成の結果が気に入らない場合は？</div>
+        <div class="faq-a">「✎ 編集する」ボタンで自由に書き直せます。タイトルからアクションポイントまですべて手動で変更できます。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta">
+    <div class="cta-title">さっそく使ってみよう</div>
+    <div class="cta-desc">
+      Googleアカウントでログインするだけ。<br>登録不要・無料ですぐ始められます。
+    </div>
+    <a href="index.html" class="cta-btn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+      </svg>
+      Googleでログインして始める
+    </a>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  <a href="terms.html">利用規約</a>　|　<a href="privacy.html">プライバシーポリシー</a>　|　<a href="mailto:0313labo@gmail.com">お問い合わせ</a>
+</div>
+
+</body>
+</html>
