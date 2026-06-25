@@ -135,15 +135,18 @@ body { background: var(--bg); font-family: 'Noto Serif JP','Hiragino Mincho ProN
 .idea-card { background:var(--surface); border:1px solid var(--border); border-radius:13px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,0.04); }
 
 /* 3色ローテーション */
-.idea-card.color-0 .card-header { border-left:3px solid var(--accent); }
+.idea-card.color-0 .card-header { border-left:3px solid var(--accent); background:var(--accent-light); }
 .idea-card.color-0 .card-summary-inline { background:var(--accent-light); }
 .idea-card.color-0 .card-summary-inline-text { color:#7A3A14; }
-.idea-card.color-1 .card-header { border-left:3px solid var(--teal); }
+.idea-card.color-0 .card-title { color:#7A3A14; }
+.idea-card.color-1 .card-header { border-left:3px solid var(--teal); background:var(--teal-light); }
 .idea-card.color-1 .card-summary-inline { background:var(--teal-light); }
 .idea-card.color-1 .card-summary-inline-text { color:#1D4D47; }
-.idea-card.color-2 .card-header { border-left:3px solid var(--indigo); }
+.idea-card.color-1 .card-title { color:#1D4D47; }
+.idea-card.color-2 .card-header { border-left:3px solid var(--indigo); background:var(--indigo-light); }
 .idea-card.color-2 .card-summary-inline { background:var(--indigo-light); }
 .idea-card.color-2 .card-summary-inline-text { color:#252D5C; }
+.idea-card.color-2 .card-title { color:#252D5C; }
 
 .card-header { display:flex; align-items:flex-start; gap:10px; padding:13px 14px 10px; cursor:pointer; -webkit-tap-highlight-color:transparent; user-select:none; }
 @media (hover:hover) { .card-header:hover { background:var(--surface-hover); } }
@@ -153,6 +156,7 @@ body { background: var(--bg); font-family: 'Noto Serif JP','Hiragino Mincho ProN
 .card-title { font-size:15px; font-weight:600; color:var(--ink); word-break:break-all; line-height:1.5; }
 .card-summary-inline { padding:0 14px 12px 14px; }
 .card-summary-inline-text { font-size:13px; line-height:1.75; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; font-family:'Noto Sans JP',sans-serif; }
+.card-summary-inline-text.expanded { -webkit-line-clamp:unset; overflow:visible; }
 .card-meta { display:flex; align-items:center; gap:6px; padding:0 14px 10px 14px; }
 .card-date { font-size:11px; color:var(--ink-faint); font-family:'Noto Sans JP',sans-serif; white-space:nowrap; flex:1; }
 .detail-toggle { background:none; border:none; font-size:12px; color:var(--ink-soft); cursor:pointer; padding:0; font-family:'Noto Sans JP',sans-serif; font-weight:600; min-height:28px; -webkit-tap-highlight-color:transparent; }
@@ -732,6 +736,7 @@ window.signOut = async () => {
   if (unsubscribe) unsubscribe();
   await fbSignOut(auth);
   ideas = []; openDetail = null; currentUser = null;
+  document.getElementById('loadingSpinner').style.display = 'none';
   document.getElementById('app').style.display = 'none';
   document.getElementById('loadingScreen').style.display = 'flex';
 };
@@ -947,7 +952,7 @@ function renderAll() {
       <span class="chevron ${isDetailOpen?'open':''}">›</span>
     </div>
     <div class="card-summary-inline">
-      <p class="card-summary-inline-text">${escHtml(idea.summary)}</p>
+      <p class="card-summary-inline-text${isDetailOpen?' expanded':''}">${escHtml(idea.summary)}</p>
     </div>
     <div class="card-meta">
       <span class="card-date">${idea.createdAt}</span>
