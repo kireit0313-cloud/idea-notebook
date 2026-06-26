@@ -163,12 +163,29 @@ body { background: var(--bg); font-family: 'Noto Serif JP','Hiragino Mincho ProN
 .del-btn { background:none; border:none; color:var(--ink-faint); cursor:pointer; font-size:13px; padding:4px 6px; flex-shrink:0; -webkit-tap-highlight-color:transparent; min-width:28px; min-height:28px; display:flex; align-items:center; justify-content:center; }
 .chevron { color:var(--ink-soft); font-size:16px; transition:transform 0.2s; display:inline-block; flex-shrink:0; margin-top:1px; }
 .chevron.open { transform:rotate(90deg); }
-.card-detail { border-top:1px solid var(--indigo-border); padding:13px 16px 15px 17px; background:var(--indigo-light); border-left:3px solid var(--indigo); }
-.detail-text { font-size:13px; color:#252D5C; line-height:1.85; margin-bottom:12px; }
+.card-detail { padding:13px 16px 15px 17px; border-left:3px solid var(--border); }
+.detail-text { font-size:13px; line-height:1.85; margin-bottom:12px; }
 .points-list { list-style:none; padding:0; margin:0 0 12px; display:flex; flex-direction:column; gap:7px; }
-.point-item { display:flex; gap:8px; font-size:13px; color:#3A4280; line-height:1.65; font-family:'Noto Sans JP',sans-serif; }
-.point-arrow { color:var(--indigo); font-weight:700; flex-shrink:0; }
-.raw-note { font-size:11px; color:var(--ink-faint); border-top:1px solid var(--indigo-border); padding-top:9px; font-family:'Noto Sans JP',sans-serif; }
+.point-item { display:flex; gap:8px; font-size:13px; line-height:1.65; font-family:'Noto Sans JP',sans-serif; }
+.point-arrow { font-weight:700; flex-shrink:0; }
+.raw-note { font-size:11px; color:var(--ink-faint); padding-top:9px; font-family:'Noto Sans JP',sans-serif; }
+
+/* 詳細エリアの色 */
+.idea-card.color-0 .card-detail { background:var(--accent-light); border-top:1px solid rgba(196,101,42,0.2); border-left-color:var(--accent); }
+.idea-card.color-0 .card-detail .detail-text { color:#7A3A14; }
+.idea-card.color-0 .card-detail .point-item { color:#7A3A14; }
+.idea-card.color-0 .card-detail .point-arrow { color:var(--accent); }
+.idea-card.color-0 .card-detail .raw-note { border-top:1px solid rgba(196,101,42,0.2); }
+.idea-card.color-1 .card-detail { background:var(--teal-light); border-top:1px solid var(--teal-border); border-left-color:var(--teal); }
+.idea-card.color-1 .card-detail .detail-text { color:#1D4D47; }
+.idea-card.color-1 .card-detail .point-item { color:#1D4D47; }
+.idea-card.color-1 .card-detail .point-arrow { color:var(--teal); }
+.idea-card.color-1 .card-detail .raw-note { border-top:1px solid var(--teal-border); }
+.idea-card.color-2 .card-detail { background:var(--indigo-light); border-top:1px solid var(--indigo-border); border-left-color:var(--indigo); }
+.idea-card.color-2 .card-detail .detail-text { color:#252D5C; }
+.idea-card.color-2 .card-detail .point-item { color:#3A4280; }
+.idea-card.color-2 .card-detail .point-arrow { color:var(--indigo); }
+.idea-card.color-2 .card-detail .raw-note { border-top:1px solid var(--indigo-border); }
 
 /* ── 編集モーダル ── */
 .edit-modal-overlay {
