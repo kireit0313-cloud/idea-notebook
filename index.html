@@ -765,6 +765,7 @@ onAuthStateChanged(auth, user => {
     document.getElementById('loadingScreen').style.display = 'none';
     document.getElementById('app').style.display = 'flex';
     // User info
+    await user.reload();
     document.getElementById('userName').textContent = user.displayName || user.email;
     if (user.photoURL) {
       const av = document.getElementById('userAvatar');
