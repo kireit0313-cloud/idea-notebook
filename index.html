@@ -1033,6 +1033,15 @@ function buildShareText(idea, mode) {
 window.openAI = async (service) => {
   const idea = ideas.find(i => i.id === sharingId);
   if (!idea) return;
+
+  // ボタンを押した直後（コピー処理より前）にタブを開く
+  // ※スマホのブラウザは「操作直後」でないとタブを開かせないため
+  const urls = {
+    gemini:  'https://gemini.google.com/',
+    chatgpt: 'https://chatgpt.com/'
+  };
+  window.open(urls[service], '_blank');
+
   const text = buildShareText(idea, shareMode);
   try {
     await navigator.clipboard.writeText(text);
@@ -1045,11 +1054,6 @@ window.openAI = async (service) => {
     document.execCommand('copy'); document.body.removeChild(ta);
     document.getElementById('shareCopiedBadge').classList.add('show');
   }
-  const urls = {
-    gemini:  'https://gemini.google.com/',
-    chatgpt: 'https://chatgpt.com/'
-  };
-  setTimeout(() => { window.open(urls[service], '_blank'); }, 300);
 };
 
 // ── 編集モーダル ────────────────────────────────────
