@@ -315,6 +315,7 @@ body { background: var(--bg); font-family: 'Noto Serif JP','Hiragino Mincho ProN
   border-bottom:1px solid var(--border-light); cursor:pointer;
   text-align:left; width:100%;
   -webkit-tap-highlight-color:transparent; transition:background 0.1s;
+  text-decoration:none; color:inherit;
 }
 .share-ai-btn:last-child { border-bottom:none; }
 .share-ai-btn:active { background:var(--surface-hover); }
@@ -614,22 +615,22 @@ body { background: var(--bg); font-family: 'Noto Serif JP','Hiragino Mincho ProN
           <button class="share-mode-btn" id="shareModeB" onclick="selectShareMode('critique')"><i class="ti ti-microscope" style="font-size:20px;display:block;margin-bottom:4px;"></i>批評・リスク洗い出し</button>
         </div>
         <div class="share-ai-list">
-          <button class="share-ai-btn" onclick="openAI('gemini')">
+          <a class="share-ai-btn" href="https://gemini.google.com/" target="_blank" rel="noopener noreferrer" onclick="copyShareText()">
             <div class="share-ai-icon" style="background:#1B73E8">G</div>
             <div>
               <div class="share-ai-name">Gemini で開く</div>
               <div class="share-ai-domain">gemini.google.com</div>
             </div>
             <span class="share-ai-arrow">↗</span>
-          </button>
-          <button class="share-ai-btn" onclick="openAI('chatgpt')">
+          </a>
+          <a class="share-ai-btn" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer" onclick="copyShareText()">
             <div class="share-ai-icon" style="background:#10A37F">GP</div>
             <div>
               <div class="share-ai-name">ChatGPT で開く</div>
               <div class="share-ai-domain">chatgpt.com</div>
             </div>
             <span class="share-ai-arrow">↗</span>
-          </button>
+          </a>
         </div>
         <p class="share-hint">開いたら貼り付け（長押し → ペースト）してください</p>
       </div>
@@ -1030,36 +1031,24 @@ function buildShareText(idea, mode) {
   return `${intro}\n\n【タイトル】\n${idea.title}\n\n【サマリー】\n${idea.summary}\n\n【詳細】\n${idea.detail}\n\n【アクションポイント】\n${points}`;
 }
 
-window.openAI = async (service) => {
+window.copyShareText = () => {
+  // リンク自体(aタグ)が遷移を担当するため、ここではクリップボードへの
+  // コピーだけを行う。本人の指によるタップとして扱われるよう、
+  // window.openやJS発火のclick()は使わない。
   const idea = ideas.find(i => i.id === sharingId);
   if (!idea) return;
-
-  const urls = {
-    gemini:  'https://gemini.google.com/',
-    chatgpt: 'https://chatgpt.com/'
-  };
-
-  // window.open の代わりに「見えないリンクを自動クリック」する方式に変更
-  // → Androidでアプリがリンクを横取りしても、正しく開けるようにするため
-  const link = document.createElement('a');
-  link.href = urls[service];
-  link.target = '_blank';
-  link.rel = 'noopener noreferrer';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-
   const text = buildShareText(idea, shareMode);
-  try {
-    await navigator.clipboard.writeText(text);
+
+  navigator.clipboard.writeText(text).then(() => {
     document.getElementById('shareCopiedBadge').classList.add('show');
-  } catch(e) {
+  }).catch(() => {
+    // クリップボード失敗時はフォールバック
     const ta = document.createElement('textarea');
     ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
     document.body.appendChild(ta); ta.select();
     document.execCommand('copy'); document.body.removeChild(ta);
     document.getElementById('shareCopiedBadge').classList.add('show');
-  }
+  });
 };
 
 // ── 編集モーダル ────────────────────────────────────
