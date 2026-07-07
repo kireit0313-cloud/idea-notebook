@@ -1034,20 +1034,26 @@ window.openAI = async (service) => {
   const idea = ideas.find(i => i.id === sharingId);
   if (!idea) return;
 
-  // ボタンを押した直後（コピー処理より前）にタブを開く
-  // ※スマホのブラウザは「操作直後」でないとタブを開かせないため
   const urls = {
     gemini:  'https://gemini.google.com/',
     chatgpt: 'https://chatgpt.com/'
   };
-  window.open(urls[service], '_blank');
+
+  // window.open の代わりに「見えないリンクを自動クリック」する方式に変更
+  // → Androidでアプリがリンクを横取りしても、正しく開けるようにするため
+  const link = document.createElement('a');
+  link.href = urls[service];
+  link.target = '_blank';
+  link.rel = 'noopener noreferrer';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 
   const text = buildShareText(idea, shareMode);
   try {
     await navigator.clipboard.writeText(text);
     document.getElementById('shareCopiedBadge').classList.add('show');
   } catch(e) {
-    // クリップボード失敗時はフォールバック
     const ta = document.createElement('textarea');
     ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
     document.body.appendChild(ta); ta.select();
