@@ -615,7 +615,7 @@ body { background: var(--bg); font-family: 'Noto Serif JP','Hiragino Mincho ProN
           <button class="share-mode-btn" id="shareModeB" onclick="selectShareMode('critique')"><i class="ti ti-microscope" style="font-size:20px;display:block;margin-bottom:4px;"></i>批評・リスク洗い出し</button>
         </div>
         <div class="share-ai-list">
-          <a class="share-ai-btn" href="https://gemini.google.com/" rel="noopener noreferrer" onclick="copyShareText()">
+          <a class="share-ai-btn" href="https://gemini.google.com/" rel="noopener noreferrer">
             <div class="share-ai-icon" style="background:#1B73E8">G</div>
             <div>
               <div class="share-ai-name">Gemini で開く</div>
@@ -623,7 +623,7 @@ body { background: var(--bg); font-family: 'Noto Serif JP','Hiragino Mincho ProN
             </div>
             <span class="share-ai-arrow">↗</span>
           </a>
-          <a class="share-ai-btn" href="https://chatgpt.com/" rel="noopener noreferrer" onclick="copyShareText()">
+          <a class="share-ai-btn" href="https://chatgpt.com/" rel="noopener noreferrer">
             <div class="share-ai-icon" style="background:#10A37F">GP</div>
             <div>
               <div class="share-ai-name">ChatGPT で開く</div>
@@ -1006,6 +1006,7 @@ window.openSharePopup = (id) => {
   document.getElementById('shareModeB').classList.remove('active');
   document.getElementById('shareCopiedBadge').classList.remove('show');
   document.getElementById('sharePopupOverlay').classList.add('open');
+  copyCurrentShareText();
 };
 
 window.closeSharePopup = () => {
@@ -1021,6 +1022,7 @@ window.selectShareMode = (mode) => {
   shareMode = mode;
   document.getElementById('shareModeA').classList.toggle('active', mode === 'brainstorm');
   document.getElementById('shareModeB').classList.toggle('active', mode === 'critique');
+  copyCurrentShareText();
 };
 
 function buildShareText(idea, mode) {
@@ -1031,10 +1033,10 @@ function buildShareText(idea, mode) {
   return `${intro}\n\n【タイトル】\n${idea.title}\n\n【サマリー】\n${idea.summary}\n\n【詳細】\n${idea.detail}\n\n【アクションポイント】\n${points}`;
 }
 
-window.copyShareText = () => {
-  // リンク自体(aタグ)が遷移を担当するため、ここではクリップボードへの
-  // コピーだけを行う。本人の指によるタップとして扱われるよう、
-  // window.openやJS発火のclick()は使わない。
+function copyCurrentShareText() {
+  // ポップアップを開いた時点・モード切替時に自動でコピーする。
+  // Gemini/ChatGPTのリンク自体にはJS処理を一切つけず「普通のリンク」の
+  // ままにしておくことで、アプリへの正しい引き渡しを妨げないようにする。
   const idea = ideas.find(i => i.id === sharingId);
   if (!idea) return;
   const text = buildShareText(idea, shareMode);
@@ -1049,7 +1051,7 @@ window.copyShareText = () => {
     document.execCommand('copy'); document.body.removeChild(ta);
     document.getElementById('shareCopiedBadge').classList.add('show');
   });
-};
+}
 
 // ── 編集モーダル ────────────────────────────────────
 let editingId = null;
